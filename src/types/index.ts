@@ -53,3 +53,14 @@ export interface PathwayRecommendation {
   reconciliation: Reconciliation
 }
 export interface PathwayHistoryEntry { id: string; associate_id: string; system_recommendation: string; mentor_recommendation: string | null; committee_decision: string; reason: string; timestamp: string; status: CommitteeStatus }
+
+// Phase 4 — ASM Milestone Journey + Commissioning Path
+export type ASMMilestoneStatus = 'COMPLETED' | 'CURRENT' | 'UPCOMING' | 'AT_RISK' | 'BLOCKED' | 'WAIVED'
+export type ASMReviewDecision = 'APPROVED' | 'REQUEST_CHANGES' | 'REJECTED'
+export interface ASMSkillMaturity { skill: string; domain: string; maturity: number }
+export interface ASMEvidence { id: string; milestone_id: string; associate_id: string; description: string; artifact_url: string; submitted_at: string }
+export interface ASMReview { id: string; milestone_id: string; associate_id: string; mentor_id: string; mentor_name: string; decision: ASMReviewDecision; comments: string; reviewed_at: string }
+export interface ASMDetail { id: string; code: string; title: string; phase: string; month: number; credits: number; status: ASMMilestoneStatus; objective: string; skills_evaluated: string[]; prerequisites: string[]; expected_outcome: string; assessment_criteria: string[]; mentor: string; skill_maturity: ASMSkillMaturity[]; evidence: ASMEvidence[]; review: ASMReview | null; fork?: string; environment?: string; started_at?: string; completed_at?: string }
+export interface AssociateASMDetail { associate_id: string; associate_name: string; milestones: ASMDetail[]; credits_earned: number; credits_target: number; current_month: number; overall_progress: number }
+export interface CommissioningStep { id: string; label: string; kind: string; status: string; month?: number; milestone_code?: string; credits?: number }
+export interface CommissioningPath { associate_id: string; associate_name: string; steps: CommissioningStep[]; commission_ready: boolean; readiness: number; completed_steps: number; total_steps: number }

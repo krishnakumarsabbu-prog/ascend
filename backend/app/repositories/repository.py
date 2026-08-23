@@ -5,7 +5,11 @@ from typing import Optional
 import uuid
 
 from app.models.schemas import (
+    ASMDetail,
+    ASMEvidence,
     ASMMilestone,
+    ASMMilestoneStatus,
+    ASMReview,
     Assessment,
     Associate,
     AssociateASMMilestone,
@@ -48,6 +52,10 @@ from app.seed.curriculum import (
     seed_curriculum_courses,
     seed_questions,
 )
+from app.seed.asm import (
+    seed_asm_details,
+    ASSOCIATE_ASM_STATE,
+)
 
 
 class Repository:
@@ -77,6 +85,13 @@ class Repository:
         # Phase 3
         self._mentor_reviews: dict[str, MentorReview] = {}
         self._committee_decisions: list[CommitteeDecision] = []
+        # Phase 4
+        self._asm_details: list[ASMDetail] = seed_asm_details()
+        self._associate_asm_state: dict[str, list[dict]] = {
+            k: [dict(v) for v in states] for k, states in ASSOCIATE_ASM_STATE.items()
+        }
+        self._asm_reviews: dict[str, ASMReview] = {}
+        self._asm_evidence: dict[str, list[ASMEvidence]] = {}
 
     # Roles
     def get_roles(self) -> list[dict]:
@@ -422,6 +437,178 @@ class Repository:
                 ))
         history.sort(key=lambda h: h.timestamp, reverse=True)
         return history
+
+    # ------------------------------------------------------------------
+    # Phase 4 — ASM Milestone Journey + Commissioning Path
+    # ------------------------------------------------------------------
+
+    def get_asm_details(self) -> list[ASMDetail]:
+        return list(self._asm_details)
+
+    def get_asm_detail(self, milestone_id: str) -> Optional[ASMDetail]:
+        for m in self._asm_details:
+            if m.id == milestone_id:
+                return m
+        return None
+
+    def get_associate_asm_details(self, associate_id: str) -> list[ASMDetail]:
+        states = self._associate_asm_state.get(associate_id, [])
+        result: list[ASMDetail] = []
+        for state in states:
+            base = self.get_asm_detail(state["id"])
+            if not base:
+                continue
+            detail = base.model_copy(deep=True)
+            detail.status = ASMMilestoneStatus(state["status"])
+            detail.started_at = state.get("started_at")
+            detail.completed_at = state.get("completed_at")
+            # Attach evidence
+            ev_list = self._asm_evidence.get(f"{associate_id}:{state['id']}", [])
+            if not ev_list and state.get("evidence"):
+                ev_list = [
+                    ASMEvidence(
+                        id=e["id"],
+                        milestone_id=state["id"],
+                        associate_id=associate_id,
+                        description=e["description"],
+                        artifact_url=e["artifact_url"],
+                        submitted_at=e["submitted_at"],
+                    )
+                    for e in state["evidence"]
+                ]
+            detail.evidence = ev_list
+            # Attach review
+            review_key = f"{associate_id}:{state['id']}"
+            review = self._asm_reviews.get(review_key)
+            if not review and state.get("review"):
+                r = state["review"]
+                review = ASMReview(
+                    id=r["id"],
+                    milestone_id=state["id"],
+                    associate_id=associate_id,
+                    mentor_id=r["mentor_id"],
+                    mentor_name=r["mentor_name"],
+                    decision=r["decision"],
+                    comments=r["comments"],
+                    reviewed_at=r["reviewed_at"],
+                )
+            detail.review = review
+            result.append(detail)
+        return result
+
+    def start_asm_milestone(self, milestone_id: str, associate_id: str) -> Optional[ASMDetail]:
+        states = self._associate_asm_state.get(associate_id, [])
+        for state in states:
+            if state["id"] == milestone_id:
+                if state["status"] in ("UPCOMING", "AT_RISK", "BLOCKED"):
+                    state["status"] = "CURRENT"
+                    state["started_at"] = datetime.now(timezone.utc)
+                break
+        return self.get_associate_asm_details(associate_id) and self._find_detail(milestone_id, associate_id)
+
+    def _find_detail(self, milestone_id: str, associate_id: str) -> Optional[ASMDetail]:
+        for d in self.get_associate_asm_details(associate_id):
+            if d.id == milestone_id:
+                return d
+        return None
+
+    def submit_asm_evidence(
+        self,
+        milestone_id: str,
+        associate_id: str,
+        description: str,
+        artifact_url: str,
+    ) -> Optional[ASMDetail]:
+        key = f"{associate_id}:{milestone_id}"
+        evidence = ASMEvidence(
+            id=f"ev-{uuid.uuid4().hex[:10]}",
+            milestone_id=milestone_id,
+            associate_id=associate_id,
+            description=description,
+            artifact_url=artifact_url,
+            submitted_at=datetime.now(timezone.utc),
+        )
+        self._asm_evidence.setdefault(key, []).append(evidence)
+        return self._find_detail(milestone_id, associate_id)
+
+    def review_asm_milestone(
+        self,
+        milestone_id: str,
+        associate_id: str,
+        mentor_id: str,
+        mentor_name: str,
+        decision: str,
+        comments: str,
+    ) -> Optional[ASMDetail]:
+        key = f"{associate_id}:{milestone_id}"
+        review = ASMReview(
+            id=f"rv-{uuid.uuid4().hex[:10]}",
+            milestone_id=milestone_id,
+            associate_id=associate_id,
+            mentor_id=mentor_id,
+            mentor_name=mentor_name,
+            decision=decision,
+            comments=comments,
+            reviewed_at=datetime.now(timezone.utc),
+        )
+        self._asm_reviews[key] = review
+        # If approved, mark milestone as completed and award credits
+        if decision == "APPROVED":
+            states = self._associate_asm_state.get(associate_id, [])
+            for state in states:
+                if state["id"] == milestone_id:
+                    state["status"] = "COMPLETED"
+                    state["completed_at"] = datetime.now(timezone.utc)
+                    # Award credits
+                    detail = self.get_asm_detail(milestone_id)
+                    if detail:
+                        balance = self.get_credit_balance(associate_id)
+                        credit = CreditEntry(
+                            id=f"cr-{uuid.uuid4().hex[:10]}",
+                            associate_id=associate_id,
+                            source=detail.code,
+                            description=f"Completed {detail.code} {detail.title}",
+                            amount=detail.credits,
+                            balance_after=balance + detail.credits,
+                            awarded_at=datetime.now(timezone.utc),
+                        )
+                        self._credits.append(credit)
+                    break
+        elif decision == "REJECTED":
+            states = self._associate_asm_state.get(associate_id, [])
+            for state in states:
+                if state["id"] == milestone_id:
+                    state["status"] = "BLOCKED"
+                    break
+        elif decision == "REQUEST_CHANGES":
+            states = self._associate_asm_state.get(associate_id, [])
+            for state in states:
+                if state["id"] == milestone_id:
+                    state["status"] = "CURRENT"
+                    break
+        return self._find_detail(milestone_id, associate_id)
+
+    def get_commissioning_path(self, associate_id: str) -> Optional[dict]:
+        associate = self.get_associate(associate_id)
+        if not associate:
+            return None
+        details = self.get_associate_asm_details(associate_id)
+        pathway = self.get_associate_pathway(associate_id)
+        completed_count = sum(1 for d in details if d.status == ASMMilestoneStatus.COMPLETED)
+        total = len(details)
+        readiness = round(completed_count / total, 2) if total > 0 else 0.0
+        commission_ready = completed_count == total
+        return {
+            "associate_id": associate_id,
+            "associate_name": associate.name,
+            "pathway_code": associate.pathway_code,
+            "pathway_name": pathway.name if pathway else associate.pathway_code,
+            "steps": details,
+            "commission_ready": commission_ready,
+            "readiness": readiness,
+            "completed_steps": completed_count,
+            "total_steps": total,
+        }
 
 
 # Module-level singleton so data persists across requests within a process.

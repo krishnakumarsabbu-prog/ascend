@@ -1,4 +1,4 @@
-import type { ASMMilestone, Associate, AttemptResult, AttemptSummary, Course, CreditEntry, CurriculumCourse, DashboardData, MentorReview, PathwayHistoryEntry, PathwayInfo, PathwayRecommendation, Question, Role, User } from '../types'
+import type { ASMDetail, ASMMilestone, Associate, AssociateASMDetail, AttemptResult, AttemptSummary, CommissioningPath, Course, CreditEntry, CurriculumCourse, DashboardData, MentorReview, PathwayHistoryEntry, PathwayInfo, PathwayRecommendation, Question, Role, User } from '../types'
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8001/api'
 
@@ -24,6 +24,14 @@ export const api = {
   courses: () => request<Course[]>('/courses'),
   milestones: () => request<ASMMilestone[]>('/asm-milestones'),
   credits: (id: string) => request<CreditEntry[]>(`/credits/${id}`),
+  asm: () => request<ASMDetail[]>('/asm'),
+  asmDetail: (id: string) => request<ASMDetail>(`/asm/${id}`),
+  associateAsm: (id: string) => request<AssociateASMDetail>(`/associates/${id}/asm`),
+  startAsm: (milestoneId: string, associateId: string) => postJson<ASMDetail>(`/asm/${milestoneId}/start`, { associate_id: associateId }),
+  submitAsm: (milestoneId: string, payload: { associate_id: string; evidence_description: string; artifact_url: string }) => postJson<ASMDetail>(`/asm/${milestoneId}/submit`, payload),
+  reviewAsm: (milestoneId: string, payload: { associate_id: string; mentor_id: string; mentor_name: string; decision: 'APPROVED' | 'REQUEST_CHANGES' | 'REJECTED'; comments: string }) => postJson<ASMDetail>(`/asm/${milestoneId}/review`, payload),
+  commissioning: (id: string) => request<CommissioningPath>(`/associates/${id}/commissioning`),
+  associateCredits: (id: string) => request<CreditEntry[]>(`/associates/${id}/credits`),
 
   // Phase 2
   curriculumCourses: () => request<CurriculumCourse[]>('/curriculum/courses'),

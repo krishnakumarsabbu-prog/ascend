@@ -297,3 +297,88 @@ def get_pathway_history(associate_id: str):
     repo = get_repository()
     service = PathwayService(repo)
     return service.get_history(associate_id)
+
+
+# ---------------------------------------------------------------------------
+# Phase 4 — ASM Milestone Journey + Commissioning Path
+# ---------------------------------------------------------------------------
+
+from app.services.asm_service import ASMService
+from app.models.schemas import StartASMRequest, SubmitASMRequest, ReviewASMRequest
+
+
+@router.get("/asm")
+def get_asm_milestones_v2():
+    repo = get_repository()
+    service = ASMService(repo)
+    return [m.model_dump() for m in service.get_all_asm()]
+
+
+@router.get("/asm/{milestone_id}")
+def get_asm_detail(milestone_id: str):
+    repo = get_repository()
+    service = ASMService(repo)
+    detail = service.get_asm(milestone_id)
+    if not detail:
+        raise HTTPException(status_code=404, detail="ASM milestone not found")
+    return detail.model_dump()
+
+
+@router.get("/associates/{associate_id}/asm")
+def get_associate_asm(associate_id: str):
+    repo = get_repository()
+    service = ASMService(repo)
+    detail = service.get_associate_asm(associate_id)
+    if not detail:
+        raise HTTPException(status_code=404, detail="Associate not found")
+    return detail.model_dump()
+
+
+@router.post("/asm/{milestone_id}/start")
+def start_asm(milestone_id: str, body: StartASMRequest):
+    repo = get_repository()
+    service = ASMService(repo)
+    detail = service.start_milestone(milestone_id, body.associate_id)
+    if not detail:
+        raise HTTPException(status_code=404, detail="ASM milestone not found")
+    return detail.model_dump()
+
+
+@router.post("/asm/{milestone_id}/submit")
+def submit_asm_evidence(milestone_id: str, body: SubmitASMRequest):
+    repo = get_repository()
+    service = ASMService(repo)
+    detail = service.submit_evidence(
+        milestone_id, body.associate_id, body.evidence_description, body.artifact_url
+    )
+    if not detail:
+        raise HTTPException(status_code=404, detail="ASM milestone not found")
+    return detail.model_dump()
+
+
+@router.post("/asm/{milestone_id}/review")
+def review_asm(milestone_id: str, body: ReviewASMRequest):
+    repo = get_repository()
+    service = ASMService(repo)
+    detail = service.review_milestone(
+        milestone_id, body.associate_id, body.mentor_id, body.mentor_name, body.decision, body.comments
+    )
+    if not detail:
+        raise HTTPException(status_code=404, detail="ASM milestone not found")
+    return detail.model_dump()
+
+
+@router.get("/associates/{associate_id}/commissioning")
+def get_commissioning(associate_id: str):
+    repo = get_repository()
+    service = ASMService(repo)
+    path = service.get_commissioning(associate_id)
+    if not path:
+        raise HTTPException(status_code=404, detail="Associate not found")
+    return path.model_dump()
+
+
+@router.get("/associates/{associate_id}/credits")
+def get_associate_credits(associate_id: str):
+    repo = get_repository()
+    return repo.get_credits(associate_id)

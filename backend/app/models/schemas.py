@@ -413,3 +413,113 @@ class PathwayHistoryEntry(BaseModel):
     reason: str
     timestamp: datetime
     status: str
+
+
+# ---------------------------------------------------------------------------
+# Phase 4 — ASM Milestone Journey + Commissioning Path
+# ---------------------------------------------------------------------------
+
+class ASMMilestoneStatus(str, Enum):
+    COMPLETED = "COMPLETED"
+    CURRENT = "CURRENT"
+    UPCOMING = "UPCOMING"
+    AT_RISK = "AT_RISK"
+    BLOCKED = "BLOCKED"
+    WAIVED = "WAIVED"
+
+
+class ASMSkillMaturity(BaseModel):
+    skill: str
+    domain: str
+    maturity: float  # 0-1
+
+
+class ASMReview(BaseModel):
+    id: str
+    milestone_id: str
+    associate_id: str
+    mentor_id: str
+    mentor_name: str
+    decision: str  # APPROVED | REQUEST_CHANGES | REJECTED
+    comments: str
+    reviewed_at: datetime
+
+
+class ASMEvidence(BaseModel):
+    id: str
+    milestone_id: str
+    associate_id: str
+    description: str
+    artifact_url: str
+    submitted_at: datetime
+
+
+class ASMDetail(BaseModel):
+    id: str
+    code: str
+    title: str
+    phase: str
+    month: int
+    credits: int
+    status: ASMMilestoneStatus
+    objective: str
+    skills_evaluated: list[str]
+    prerequisites: list[str]
+    expected_outcome: str
+    assessment_criteria: list[str]
+    mentor: str
+    skill_maturity: list[ASMSkillMaturity]
+    evidence: list[ASMEvidence]
+    review: Optional[ASMReview] = None
+    fork: Optional[str] = None
+    environment: Optional[str] = None
+    started_at: Optional[datetime] = None
+    completed_at: Optional[datetime] = None
+
+
+class AssociateASMDetail(BaseModel):
+    associate_id: str
+    associate_name: str
+    milestones: list[ASMDetail]
+    credits_earned: int
+    credits_target: int
+    current_month: int
+    overall_progress: float
+
+
+class CommissioningStep(BaseModel):
+    id: str
+    label: str
+    kind: str  # foundation | gate | pathway | asm | commission
+    status: str  # COMPLETED | CURRENT | UPCOMING | BLOCKED
+    month: Optional[int] = None
+    milestone_code: Optional[str] = None
+    credits: Optional[int] = None
+
+
+class CommissioningPath(BaseModel):
+    associate_id: str
+    associate_name: str
+    steps: list[CommissioningStep]
+    commission_ready: bool
+    readiness: float
+    completed_steps: int
+    total_steps: int
+
+
+class StartASMRequest(BaseModel):
+    associate_id: str = "as-ananya"
+
+
+class SubmitASMRequest(BaseModel):
+    associate_id: str = "as-ananya"
+    evidence_description: str = ""
+    artifact_url: str = ""
+
+
+class ReviewASMRequest(BaseModel):
+    associate_id: str = "as-ananya"
+    mentor_id: str = "u-karthik"
+    mentor_name: str = "Karthik Iyer"
+    decision: str  # APPROVED | REQUEST_CHANGES | REJECTED
+    comments: str = ""

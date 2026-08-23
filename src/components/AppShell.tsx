@@ -11,16 +11,16 @@ interface NavItem { label: string; icon: typeof LayoutDashboard; badge?: string;
 const navByRole: Record<RoleId, { group: string; items: NavItem[] }[]> = {
   EARLY_TALENT: [
     { group: 'Workspace', items: [{ label: 'My Dashboard', icon: LayoutDashboard, to: '/' }, { label: 'Integrated Curriculum', icon: BookOpen, badge: '7', to: '/curriculum' }, { label: 'Pathway Selection', icon: Route, to: '/pathways' }, { label: 'Program Overview', icon: GraduationCap }] },
-    { group: 'Engineering Journey', items: [{ label: 'WF Course Assessments', icon: ClipboardCheck, to: '/curriculum' }, { label: 'Take Assessment', icon: Target, to: '/curriculum' }, { label: 'ASM Milestones', icon: GitBranch }, { label: 'ASM Fork & Environment', icon: Code2 }, { label: 'Advanced Intensives', icon: Sparkles }, { label: 'Architect Board', icon: Network }] },
+    { group: 'Engineering Journey', items: [{ label: 'WF Course Assessments', icon: ClipboardCheck, to: '/curriculum' }, { label: 'Take Assessment', icon: Target, to: '/curriculum' }, { label: 'ASM Milestones', icon: GitBranch, to: '/asm' }, { label: 'ASM Fork & Environment', icon: Code2 }, { label: 'Advanced Intensives', icon: Sparkles }, { label: 'Architect Board', icon: Network }] },
     { group: 'Recognition', items: [{ label: 'Credit Ledger', icon: Coins }] },
   ],
   MENTOR_COACH: [
     { group: 'Workspace', items: [{ label: 'My Mentees', icon: Users, badge: '4' }, { label: 'Mentee Requests', icon: Bell, badge: '2' }, { label: 'Development Plan', icon: ClipboardCheck }] },
-    { group: 'Guidance', items: [{ label: 'Pathway Panel', icon: Route, to: '/pathways' }, { label: 'Waiver Recommendations', icon: ShieldCheck }, { label: 'Architect Board Panel', icon: Network }] },
+    { group: 'Guidance', items: [{ label: 'Pathway Panel', icon: Route, to: '/pathways' }, { label: 'ASM Reviews', icon: GitBranch, to: '/asm' }, { label: 'Waiver Recommendations', icon: ShieldCheck }, { label: 'Architect Board Panel', icon: Network }] },
   ],
   ENGINEERING_EXCELLENCE_COMMITTEE: [
     { group: 'Governance', items: [{ label: 'Cohort Overview', icon: Users }, { label: 'Pathway Panel', icon: Route, to: '/pathways' }, { label: 'Assessment Setup', icon: Settings2 }] },
-    { group: 'Standards', items: [{ label: 'Question Bank', icon: BookOpen }, { label: 'ASM Library', icon: GitBranch }, { label: 'Waiver Requests', icon: ShieldCheck }, { label: 'Difficulty Engine', icon: Target }, { label: 'Ledger Audit', icon: Coins }] },
+    { group: 'Standards', items: [{ label: 'Question Bank', icon: BookOpen }, { label: 'ASM Library', icon: GitBranch, to: '/asm' }, { label: 'Waiver Requests', icon: ShieldCheck }, { label: 'Difficulty Engine', icon: Target }, { label: 'Ledger Audit', icon: Coins }] },
   ],
   SENIOR_LEADER_SPONSOR: [
     { group: 'Portfolio', items: [{ label: 'Demand & Pipeline', icon: BriefcaseBusiness }, { label: 'Sponsored ASM Milestones', icon: GitBranch }] },
