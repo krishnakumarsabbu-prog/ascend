@@ -79,3 +79,55 @@ export interface ASMLibraryRow { id: string; code: string; milestone: string; mo
 export interface GovernanceWaiver { id: string; associate: string; course: string; milestone: string; mentor_recommendation: string; system_reason: string; status: GovernanceStatus; history: { label: string; detail: string; date: string }[] }
 export interface DifficultyRow { id: string; course: string; tier: Tier; average_score: number; pass_rate: number; difficulty: DifficultyClass; calibration: number }
 export interface LedgerAuditRow { id: string; associate: string; date: string; domain: string; instrument: string; level: string; credits: number; source: string; status: GovernanceStatus }
+
+// Phase 7 — Senior Leader Sponsor: Demand & Pipeline Intelligence
+export type WorkforceRisk = 'Healthy' | 'Watch' | 'High Demand' | 'Critical Shortfall'
+
+export interface OpenRole { title: string; pathway: string; skill_level: string; priority: string; target_month: number }
+export interface ReadyAssociate { id: string; name: string; pathway: string; readiness: number; current_month: number; standing: string }
+export interface TeamPipeline {
+  id: string
+  name: string
+  lead: string
+  focus: string
+  demand: number
+  ready: number
+  shortfall: number
+  readiness: number
+  risk: WorkforceRisk
+  pathway_demand: Record<string, number>
+  open_roles: OpenRole[]
+  ready_associates: ReadyAssociate[]
+}
+export interface DemandOverview {
+  total_demand: number
+  total_ready: number
+  total_shortfall: number
+  readiness: number
+  team_count: number
+  risk_distribution: Record<WorkforceRisk, number>
+  teams: TeamPipeline[]
+}
+export interface DemandTeamSummary { id: string; name: string; lead: string; focus: string; open_role_count: number }
+export interface PipelineOverview { total_demand: number; total_ready: number; total_shortfall: number; teams: TeamPipeline[] }
+export interface Recommendation {
+  id: string
+  team: string
+  priority: 'P0' | 'P1' | 'P2' | 'P3'
+  action: string
+  detail: string
+  impact: 'High' | 'Medium' | 'Low'
+}
+export interface SponsoredASM {
+  id: string
+  associate_id: string
+  associate_name: string
+  business_team: string
+  asm_code: string
+  asm_title: string
+  skills: string[]
+  pipeline: string
+  demand_impact: number
+  target_month: number
+  priority: string
+}

@@ -484,3 +484,55 @@ def get_commissioning(associate_id: str):
 def get_associate_credits(associate_id: str):
     repo = get_repository()
     return repo.get_credits(associate_id)
+
+
+# ---------------------------------------------------------------------------
+# Phase 7 — Senior Leader Sponsor: Demand & Pipeline Intelligence
+# ---------------------------------------------------------------------------
+
+from app.services.demand_service import DemandService
+
+
+def _demand_service():
+    return DemandService(get_repository())
+
+
+@router.get("/demand")
+def get_demand():
+    return _demand_service().get_demand_overview()
+
+
+@router.get("/demand/teams")
+def get_demand_teams():
+    return _demand_service().get_teams()
+
+
+@router.get("/demand/{team_id}")
+def get_demand_team(team_id: str):
+    team = _demand_service().get_team(team_id)
+    if not team:
+        raise HTTPException(status_code=404, detail="Team not found")
+    return team
+
+
+@router.get("/pipeline")
+def get_pipeline():
+    return _demand_service().get_pipeline_overview()
+
+
+@router.get("/pipeline/{team_id}")
+def get_pipeline_team(team_id: str):
+    team = _demand_service().get_team_pipeline(team_id)
+    if not team:
+        raise HTTPException(status_code=404, detail="Team not found")
+    return team
+
+
+@router.get("/workforce/recommendations")
+def get_workforce_recommendations():
+    return _demand_service().get_recommendations()
+
+
+@router.get("/sponsored-asm")
+def get_sponsored_asm():
+    return _demand_service().get_sponsored_asm()

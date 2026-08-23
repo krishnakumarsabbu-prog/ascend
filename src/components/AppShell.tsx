@@ -23,8 +23,8 @@ const navByRole: Record<RoleId, { group: string; items: NavItem[] }[]> = {
     { group: 'Standards', items: [{ label: 'Question Bank', icon: BookOpen, to: '/committee?view=questions' }, { label: 'ASM Library', icon: GitBranch, to: '/committee?view=asm' }, { label: 'Waiver Requests', icon: ShieldCheck, to: '/committee?view=waivers' }, { label: 'Difficulty Engine', icon: Target, to: '/committee?view=difficulty' }, { label: 'Ledger Audit', icon: Coins, to: '/committee?view=ledger' }] },
   ],
   SENIOR_LEADER_SPONSOR: [
-    { group: 'Portfolio', items: [{ label: 'Demand & Pipeline', icon: BriefcaseBusiness }, { label: 'Sponsored ASM Milestones', icon: GitBranch }] },
-    { group: 'Decisions', items: [{ label: 'Approvals', icon: ShieldCheck }, { label: 'Architect Board Panel', icon: Network }] },
+    { group: 'Portfolio', items: [{ label: 'Demand & Pipeline', icon: BriefcaseBusiness, to: '/sponsor' }, { label: 'Sponsored ASM Milestones', icon: GitBranch, to: '/sponsor' }] },
+    { group: 'Decisions', items: [{ label: 'Approvals', icon: ShieldCheck, to: '/sponsor' }, { label: 'Architect Board Panel', icon: Network }] },
   ],
 }
 

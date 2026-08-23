@@ -1,4 +1,4 @@
-import type { ASMDetail, ASMMilestone, Associate, AssociateASMDetail, AttemptResult, AttemptSummary, CommissioningPath, Course, CreditEntry, CurriculumCourse, DashboardData, DevelopmentGoal, MenteeProfile, MentorMentee, MentorReview, PathwayHistoryEntry, PathwayInfo, PathwayRecommendation, Question, Role, User, Waiver, GovernanceOverview, QuestionBankRow, ASMLibraryRow, GovernanceWaiver, DifficultyRow, LedgerAuditRow } from '../types'
+import type { ASMDetail, ASMMilestone, Associate, AssociateASMDetail, AttemptResult, AttemptSummary, CommissioningPath, Course, CreditEntry, CurriculumCourse, DashboardData, DevelopmentGoal, DemandOverview, DemandTeamSummary, MenteeProfile, MentorMentee, MentorReview, PathwayHistoryEntry, PathwayInfo, PathwayRecommendation, PipelineOverview, Question, Recommendation, Role, SponsoredASM, TeamPipeline, User, Waiver, GovernanceOverview, QuestionBankRow, ASMLibraryRow, GovernanceWaiver, DifficultyRow, LedgerAuditRow } from '../types'
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8001/api'
 
@@ -64,4 +64,13 @@ export const api = {
   submitMentorReview: (review: { associate_id: string; mentor_id: string; mentor_name: string; recommended_pathway: string; confidence: number; strengths: string; concerns: string; comments: string }) => postJson<MentorReview>('/pathways/mentor-review', review),
   submitCommitteeDecision: (decision: { associate_id: string; system_recommendation: string; mentor_recommendation: string; committee_decision: string; reason: string; status: string }) => postJson<{ id: string }>('/pathways/committee-decision', decision),
   pathwayHistory: (associateId: string) => request<PathwayHistoryEntry[]>(`/pathways/history/${associateId}`),
+
+  // Phase 7 — Senior Leader Sponsor
+  demand: () => request<DemandOverview>('/demand'),
+  demandTeams: () => request<DemandTeamSummary[]>('/demand/teams'),
+  demandTeam: (teamId: string) => request<TeamPipeline>(`/demand/${teamId}`),
+  pipeline: () => request<PipelineOverview>('/pipeline'),
+  pipelineTeam: (teamId: string) => request<TeamPipeline>(`/pipeline/${teamId}`),
+  workforceRecommendations: () => request<Recommendation[]>('/workforce/recommendations'),
+  sponsoredAsm: () => request<SponsoredASM[]>('/sponsored-asm'),
 }
