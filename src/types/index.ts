@@ -16,3 +16,16 @@ export interface ProgressSegment { label: string; value: number; target: number;
 export interface NextAction { id: string; title: string; detail: string; due: string; priority: string; kind: string }
 export interface MonthProgress { month: number; label: string; status: MilestoneStatus; milestone?: string; credits: number }
 export interface DashboardData { associate: Associate; current_month: number; pathway: AssociatePathway; overall_progress: number; assessment_progress: number; asm_progress: number; credits_earned: number; credits_target: number; next_milestone?: AssociateASMMilestone; readiness: number; standing: Standing; progress_segments: ProgressSegment[]; next_actions: NextAction[]; month_progress: MonthProgress[]; recent_credits: CreditEntry[]; assessments: AssociateAssessment[] }
+
+// Phase 2 — Curriculum + Assessment Platform
+export type Tier = 'Basic' | 'Novice' | 'Apprentice' | 'Expert' | 'Master'
+
+export interface CurriculumCourse { id: string; code: string; name: string; domain: string; difficulty: string; progress: number; assessment: string; credits: number; status: string }
+export interface QuestionOption { id: string; text: string }
+export interface Question { id: string; course_id: string; tier: Tier; question: string; options: QuestionOption[]; correct_answer: string; explanation: string; domain: string }
+export interface AttemptQuestion { id: string; tier: Tier; question: string; options: QuestionOption[]; domain: string }
+export interface AttemptSummary { id: string; course_id: string; course_code: string; course_name: string; associate_id: string; status: string; started_at: string; time_limit_minutes: number; total_questions: number; answered: number; marked_for_review: number; current_index: number; answers: Record<string, string>; marked: string[] }
+export interface DomainScore { domain: string; total: number; correct: number; incorrect: number; skipped: number; percentage: number }
+export interface TierPerformance { tier: string; total: number; correct: number; incorrect: number; skipped: number; percentage: number }
+export interface PerformanceInsight { strongest_area: string; improvement_area: string; recommended_next_action: string }
+export interface AttemptResult { attempt_id: string; course_id: string; course_code: string; course_name: string; associate_id: string; status: string; score: number; correct: number; incorrect: number; skipped: number; total_questions: number; passing_score: number; passed: boolean; gate_status: string; domain_scores: DomainScore[]; tier_performance: TierPerformance[]; insights: PerformanceInsight; completed_at: string }

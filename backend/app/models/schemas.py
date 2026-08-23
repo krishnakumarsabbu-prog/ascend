@@ -207,3 +207,118 @@ class DashboardData(BaseModel):
     month_progress: List[MonthProgress]
     recent_credits: List[CreditEntry]
     assessments: List[AssociateAssessment]
+
+
+# ---------------------------------------------------------------------------
+# Phase 2 — Integrated Curriculum + Technical Assessment Platform
+# ---------------------------------------------------------------------------
+
+class Tier(str, Enum):
+    BASIC = "Basic"
+    NOVICE = "Novice"
+    APPRENTICE = "Apprentice"
+    EXPERT = "Expert"
+    MASTER = "Master"
+
+
+class CurriculumCourse(BaseModel):
+    id: str
+    code: str
+    name: str
+    domain: str
+    difficulty: str
+    progress: float
+    assessment: str
+    credits: int
+    status: str
+
+
+class QuestionOption(BaseModel):
+    id: str
+    text: str
+
+
+class Question(BaseModel):
+    id: str
+    course_id: str
+    tier: Tier
+    question: str
+    options: List[QuestionOption]
+    correct_answer: str
+    explanation: str
+    domain: str
+
+
+class AttemptQuestion(BaseModel):
+    id: str
+    tier: Tier
+    question: str
+    options: List[QuestionOption]
+    domain: str
+
+
+class AttemptSummary(BaseModel):
+    id: str
+    course_id: str
+    course_code: str
+    course_name: str
+    associate_id: str
+    status: str
+    started_at: datetime
+    time_limit_minutes: int
+    total_questions: int
+    answered: int
+    marked_for_review: int
+    current_index: int
+    answers: dict
+    marked: List[str]
+
+
+class AnswerSubmission(BaseModel):
+    question_id: str
+    selected_option: str
+
+
+class DomainScore(BaseModel):
+    domain: str
+    total: int
+    correct: int
+    incorrect: int
+    skipped: int
+    percentage: float
+
+
+class TierPerformance(BaseModel):
+    tier: str
+    total: int
+    correct: int
+    incorrect: int
+    skipped: int
+    percentage: float
+
+
+class PerformanceInsight(BaseModel):
+    strongest_area: str
+    improvement_area: str
+    recommended_next_action: str
+
+
+class AttemptResult(BaseModel):
+    attempt_id: str
+    course_id: str
+    course_code: str
+    course_name: str
+    associate_id: str
+    status: str
+    score: int
+    correct: int
+    incorrect: int
+    skipped: int
+    total_questions: int
+    passing_score: int
+    passed: bool
+    gate_status: str
+    domain_scores: List[DomainScore]
+    tier_performance: List[TierPerformance]
+    insights: PerformanceInsight
+    completed_at: datetime

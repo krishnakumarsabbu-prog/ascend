@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+from datetime import datetime, timezone
 from typing import Optional
+import uuid
 
 from app.models.schemas import (
     ASMMilestone,
@@ -9,8 +11,16 @@ from app.models.schemas import (
     AssociateASMMilestone,
     AssociateAssessment,
     AssociatePathway,
+    AttemptResult,
+    AttemptSummary,
     Course,
     CreditEntry,
+    CurriculumCourse,
+    DomainScore,
+    PerformanceInsight,
+    Question,
+    Tier,
+    TierPerformance,
     Pathway,
     Role,
     Team,
@@ -29,6 +39,11 @@ from app.seed.data import (
     seed_roles,
     seed_teams,
     seed_users,
+)
+from app.seed.curriculum import (
+    COURSE_META,
+    seed_curriculum_courses,
+    seed_questions,
 )
 
 
@@ -52,6 +67,10 @@ class Repository:
         self._associate_asm_milestones: list[AssociateASMMilestone] = seed_associate_asm_milestones()
         self._credits: list[CreditEntry] = seed_credits()
         self._associate_pathways: list[AssociatePathway] = seed_associate_pathways()
+        # Phase 2
+        self._curriculum_courses: list[CurriculumCourse] = seed_curriculum_courses()
+        self._questions: list[Question] = seed_questions()
+        self._attempts: dict[str, dict] = {}
 
     # Roles
     def get_roles(self) -> list[dict]:
@@ -177,6 +196,194 @@ class Repository:
         if not entries:
             return 0
         return max(c.balance_after for c in entries)
+
+    # ------------------------------------------------------------------
+    # Phase 2 — Curriculum, Question Bank, Assessment Attempts
+    # ------------------------------------------------------------------
+
+    def get_curriculum_courses(self) -> list[CurriculumCourse]:
+        return list(self._curriculum_courses)
+
+    def get_curriculum_course(self, course_id: str) -> Optional[CurriculumCourse]:
+        for c in self._curriculum_courses:
+            if c.id == course_id:
+                return c
+        return None
+
+    def get_course_meta(self, course_id: str) -> Optional[dict]:
+        return COURSE_META.get(course_id)
+
+    def get_questions_by_course(self, course_id: str) -> list[Question]:
+        return [q for q in self._questions if q.course_id == course_id]
+
+    def get_question(self, question_id: str) -> Optional[Question]:
+        for q in self._questions:
+            if q.id == question_id:
+                return q
+        return None
+
+    def create_attempt(self, course_id: str, associate_id: str) -> dict:
+        meta = self.get_course_meta(course_id)
+        if not meta:
+            return {}
+        questions = self.get_questions_by_course(course_id)
+        attempt_id = f"att-{uuid.uuid4().hex[:12]}"
+        attempt = {
+            "id": attempt_id,
+            "course_id": course_id,
+            "course_code": meta["code"],
+            "course_name": meta["name"],
+            "domain": meta["domain"],
+            "associate_id": associate_id,
+            "status": "IN_PROGRESS",
+            "started_at": datetime.now(timezone.utc),
+            "time_limit_minutes": meta["time_limit"],
+            "passing_score": meta["passing_score"],
+            "questions": questions,
+            "answers": {},
+            "marked": [],
+            "current_index": 0,
+        }
+        self._attempts[attempt_id] = attempt
+        return attempt
+
+    def get_attempt(self, attempt_id: str) -> Optional[dict]:
+        return self._attempts.get(attempt_id)
+
+    def save_answer(self, attempt_id: str, question_id: str, selected_option: str) -> Optional[dict]:
+        attempt = self._attempts.get(attempt_id)
+        if not attempt:
+            return None
+        attempt["answers"][question_id] = selected_option
+        return attempt
+
+    def toggle_mark(self, attempt_id: str, question_id: str) -> Optional[dict]:
+        attempt = self._attempts.get(attempt_id)
+        if not attempt:
+            return None
+        if question_id in attempt["marked"]:
+            attempt["marked"].remove(question_id)
+        else:
+            attempt["marked"].append(question_id)
+        return attempt
+
+    def set_current_index(self, attempt_id: str, index: int) -> Optional[dict]:
+        attempt = self._attempts.get(attempt_id)
+        if not attempt:
+            return None
+        attempt["current_index"] = index
+        return attempt
+
+    def submit_attempt(self, attempt_id: str) -> Optional[dict]:
+        attempt = self._attempts.get(attempt_id)
+        if not attempt:
+            return None
+        attempt["status"] = "SUBMITTED"
+        attempt["completed_at"] = datetime.now(timezone.utc)
+        return attempt
+
+    def compute_result(self, attempt_id: str) -> Optional[AttemptResult]:
+        attempt = self._attempts.get(attempt_id)
+        if not attempt:
+            return None
+        questions: list[Question] = attempt["questions"]
+        answers: dict[str, str] = attempt["answers"]
+        total = len(questions)
+        correct = 0
+        incorrect = 0
+        skipped = 0
+        domain_map: dict[str, dict] = {}
+        tier_map: dict[str, dict] = {}
+
+        for q in questions:
+            selected = answers.get(q.id)
+            domain = q.domain
+            tier = q.tier.value
+
+            if domain not in domain_map:
+                domain_map[domain] = {"total": 0, "correct": 0, "incorrect": 0, "skipped": 0}
+            if tier not in tier_map:
+                tier_map[tier] = {"total": 0, "correct": 0, "incorrect": 0, "skipped": 0}
+
+            domain_map[domain]["total"] += 1
+            tier_map[tier]["total"] += 1
+
+            if selected is None:
+                skipped += 1
+                domain_map[domain]["skipped"] += 1
+                tier_map[tier]["skipped"] += 1
+            elif selected == q.correct_answer:
+                correct += 1
+                domain_map[domain]["correct"] += 1
+                tier_map[tier]["correct"] += 1
+            else:
+                incorrect += 1
+                domain_map[domain]["incorrect"] += 1
+                tier_map[tier]["incorrect"] += 1
+
+        score = round((correct / total * 100)) if total > 0 else 0
+        passing_score = attempt["passing_score"]
+        passed = score >= passing_score
+
+        domain_scores = [
+            DomainScore(
+                domain=d,
+                total=v["total"],
+                correct=v["correct"],
+                incorrect=v["incorrect"],
+                skipped=v["skipped"],
+                percentage=round((v["correct"] / v["total"] * 100)) if v["total"] > 0 else 0,
+            )
+            for d, v in domain_map.items()
+        ]
+        tier_performance = [
+            TierPerformance(
+                tier=t,
+                total=v["total"],
+                correct=v["correct"],
+                incorrect=v["incorrect"],
+                skipped=v["skipped"],
+                percentage=round((v["correct"] / v["total"] * 100)) if v["total"] > 0 else 0,
+            )
+            for t, v in tier_map.items()
+        ]
+
+        strongest = max(domain_scores, key=lambda d: d.percentage, default=None)
+        weakest = min(domain_scores, key=lambda d: d.percentage, default=None)
+        strongest_area = strongest.domain if strongest else "N/A"
+        improvement_area = weakest.domain if weakest else "N/A"
+
+        if passed:
+            recommended = f"Advance to the next course in the {attempt['domain']} track."
+        else:
+            recommended = f"Review {improvement_area} concepts and retake the assessment."
+
+        insights = PerformanceInsight(
+            strongest_area=strongest_area,
+            improvement_area=improvement_area,
+            recommended_next_action=recommended,
+        )
+
+        return AttemptResult(
+            attempt_id=attempt_id,
+            course_id=attempt["course_id"],
+            course_code=attempt["course_code"],
+            course_name=attempt["course_name"],
+            associate_id=attempt["associate_id"],
+            status="COMPLETED",
+            score=score,
+            correct=correct,
+            incorrect=incorrect,
+            skipped=skipped,
+            total_questions=total,
+            passing_score=passing_score,
+            passed=passed,
+            gate_status="PASSED" if passed else "NEEDS_IMPROVEMENT",
+            domain_scores=domain_scores,
+            tier_performance=tier_performance,
+            insights=insights,
+            completed_at=attempt.get("completed_at") or datetime.now(timezone.utc),
+        )
 
 
 # Module-level singleton so data persists across requests within a process.
