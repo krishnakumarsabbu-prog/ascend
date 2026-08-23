@@ -131,6 +131,48 @@ def review_waiver(waiver_id: str, body: WaiverReviewRequest):
     return waiver
 
 
+# ---------------------------------------------------------------------------
+# Phase 6 — Engineering Excellence Committee Governance
+# ---------------------------------------------------------------------------
+
+@router.get("/committee/overview")
+def get_committee_overview():
+    return get_repository().get_committee_overview()
+
+
+@router.get("/committee/question-bank")
+def get_question_bank():
+    return get_repository().get_question_bank()
+
+
+@router.get("/committee/asm-library")
+def get_asm_library():
+    return get_repository().get_asm_library()
+
+
+@router.get("/committee/waivers")
+def get_governance_waivers():
+    return get_repository().get_governance_waivers()
+
+
+@router.get("/committee/difficulty")
+def get_difficulty_engine():
+    return get_repository().get_difficulty_engine()
+
+
+@router.get("/committee/ledger")
+def get_ledger_audit():
+    return get_repository().get_ledger_audit()
+
+
+@router.post("/committee/{area}/{item_id}/{action}")
+def update_governance(area: str, item_id: str, action: str):
+    result = get_repository().update_governance(area, item_id, action)
+    if not result:
+        raise HTTPException(status_code=404, detail="Governance item not found")
+    return result
+
+
 @router.get("/courses")
 def get_courses():
     repo = get_repository()

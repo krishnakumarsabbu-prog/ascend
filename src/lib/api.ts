@@ -1,4 +1,4 @@
-import type { ASMDetail, ASMMilestone, Associate, AssociateASMDetail, AttemptResult, AttemptSummary, CommissioningPath, Course, CreditEntry, CurriculumCourse, DashboardData, DevelopmentGoal, MenteeProfile, MentorMentee, MentorReview, PathwayHistoryEntry, PathwayInfo, PathwayRecommendation, Question, Role, User, Waiver } from '../types'
+import type { ASMDetail, ASMMilestone, Associate, AssociateASMDetail, AttemptResult, AttemptSummary, CommissioningPath, Course, CreditEntry, CurriculumCourse, DashboardData, DevelopmentGoal, MenteeProfile, MentorMentee, MentorReview, PathwayHistoryEntry, PathwayInfo, PathwayRecommendation, Question, Role, User, Waiver, GovernanceOverview, QuestionBankRow, ASMLibraryRow, GovernanceWaiver, DifficultyRow, LedgerAuditRow } from '../types'
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8001/api'
 
@@ -38,6 +38,13 @@ export const api = {
   createDevelopmentPlan: (payload: Omit<DevelopmentGoal, 'id' | 'updated_at'>) => postJson<DevelopmentGoal>('/development-plan', payload),
   waivers: () => request<Waiver[]>('/waivers'),
   reviewWaiver: (id: string, mentorId: string, recommendation: 'RECOMMEND' | 'DO_NOT_RECOMMEND') => postJson<Waiver>(`/waivers/${id}/mentor-review`, { mentor_id: mentorId, recommendation }),
+  committeeOverview: () => request<GovernanceOverview>('/committee/overview'),
+  questionBank: () => request<QuestionBankRow[]>('/committee/question-bank'),
+  asmLibrary: () => request<ASMLibraryRow[]>('/committee/asm-library'),
+  governanceWaivers: () => request<GovernanceWaiver[]>('/committee/waivers'),
+  difficultyEngine: () => request<DifficultyRow[]>('/committee/difficulty'),
+  ledgerAudit: () => request<LedgerAuditRow[]>('/committee/ledger'),
+  updateGovernance: (area: string, id: string, action: string) => postJson<{ status: string; id: string }>(`/committee/${area}/${id}/${action}`, {}),
 
   // Phase 2
   curriculumCourses: () => request<CurriculumCourse[]>('/curriculum/courses'),

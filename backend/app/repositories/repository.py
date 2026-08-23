@@ -109,6 +109,34 @@ class Repository:
             {"id": "waiver-1", "associate_id": "as-ananya", "associate": "Ananya Rao", "current_milestone": "ASM-101 · Foundation Build", "eligible_course": "DATA-201 · Distributed Data Systems", "system_recommendation": "Recommend review", "reason": "ASM-101 was cleared with strong evidence and an 88% WF-101 assessment score.", "mentor_recommendation": None, "status": "PENDING_REVIEW", "history": [{"label": "System suggestion", "detail": "Eligible after ASM-101 clearance", "date": "2025-03-01"}]},
             {"id": "waiver-2", "associate_id": "as-rohan", "associate": "Rohan Mehta", "current_milestone": "ASM-101 · Foundation Build", "eligible_course": "WF-102 · Production Systems", "system_recommendation": "Recommend review", "reason": "ASM-101 was approved. A waiver review can accelerate the foundation tier while preserving mentor oversight.", "mentor_recommendation": None, "status": "PENDING_REVIEW", "history": [{"label": "System suggestion", "detail": "Eligible after ASM-101 clearance", "date": "2025-03-10"}]},
         ]
+        self._question_bank = [
+            {"id": "qb-wf101-basic", "course": "WF-101 Engineering Foundations", "tier": "Basic", "question_count": 48, "coverage": 96, "pass_rate": 91, "last_rotation": "18 Aug 2025", "live_sample_status": "LIVE", "status": "LIVE"},
+            {"id": "qb-wf102-novice", "course": "WF-102 Production Systems", "tier": "Novice", "question_count": 42, "coverage": 88, "pass_rate": 84, "last_rotation": "12 Aug 2025", "live_sample_status": "LIVE", "status": "LIVE"},
+            {"id": "qb-pay201-apprentice", "course": "PAY-201 Payments Domain", "tier": "Apprentice", "question_count": 36, "coverage": 79, "pass_rate": 76, "last_rotation": "02 Aug 2025", "live_sample_status": "LIVE", "status": "LIVE"},
+            {"id": "qb-data201-expert", "course": "DATA-201 Distributed Data", "tier": "Expert", "question_count": 28, "coverage": 72, "pass_rate": 68, "last_rotation": "21 Jul 2025", "live_sample_status": "DRAFT", "status": "DRAFT"},
+            {"id": "qb-arch301-master", "course": "ARCH-301 System Architecture", "tier": "Master", "question_count": 18, "coverage": 93, "pass_rate": 61, "last_rotation": "28 Jul 2025", "live_sample_status": "LIVE", "status": "LIVE"},
+        ]
+        self._asm_library = [
+            {"id": "asm-lib-101", "code": "ASM-101", "milestone": "Foundation Build", "month": 2, "wf_course": "WF-101", "rubric_focus": "Testing, CI, operational baseline", "credits": 12, "status": "LIVE"},
+            {"id": "asm-lib-102", "code": "ASM-102", "milestone": "Integration Milestone", "month": 4, "wf_course": "WF-102", "rubric_focus": "Contracts, integration, observability", "credits": 12, "status": "LIVE"},
+            {"id": "asm-lib-201", "code": "ASM-201", "milestone": "Domain Deep Build", "month": 10, "wf_course": "PAY-201 / DATA-201", "rubric_focus": "Domain depth, performance, reliability", "credits": 24, "status": "LIVE"},
+            {"id": "asm-lib-202", "code": "ASM-202", "milestone": "Operational Ownership", "month": 13, "wf_course": "WF-102", "rubric_focus": "SLOs, on-call, incident command", "credits": 18, "status": "DRAFT"},
+            {"id": "asm-lib-301", "code": "ASM-301", "milestone": "Architect Board Certification", "month": 22, "wf_course": "ARCH-301", "rubric_focus": "Trade-offs, architecture defense", "credits": 30, "status": "LIVE"},
+        ]
+        self._difficulty_engine = [
+            {"id": "diff-wf101", "course": "WF-101 Engineering Foundations", "tier": "Basic", "average_score": 86, "pass_rate": 91, "difficulty": "Too Easy", "calibration": 2},
+            {"id": "diff-wf102", "course": "WF-102 Production Systems", "tier": "Novice", "average_score": 79, "pass_rate": 84, "difficulty": "Balanced", "calibration": 0},
+            {"id": "diff-pay201", "course": "PAY-201 Payments Domain", "tier": "Apprentice", "average_score": 74, "pass_rate": 76, "difficulty": "Balanced", "calibration": -1},
+            {"id": "diff-data201", "course": "DATA-201 Distributed Data", "tier": "Expert", "average_score": 68, "pass_rate": 68, "difficulty": "Too Difficult", "calibration": -3},
+            {"id": "diff-arch301", "course": "ARCH-301 System Architecture", "tier": "Master", "average_score": 65, "pass_rate": 61, "difficulty": "Too Difficult", "calibration": -2},
+        ]
+        self._ledger_audit = [
+            {"id": "ledger-001", "associate": "Ananya Rao", "date": "2025-08-15", "domain": "Data", "instrument": "ASM-101", "level": "Foundation", "credits": 12, "source": "Milestone completion", "status": "APPROVED"},
+            {"id": "ledger-002", "associate": "Rohan Mehta", "date": "2025-08-12", "domain": "Software", "instrument": "WF-101", "level": "Basic", "credits": 6, "source": "Assessment pass", "status": "APPROVED"},
+            {"id": "ledger-003", "associate": "Ananya Rao", "date": "2025-08-08", "domain": "Security", "instrument": "SEC-201", "level": "Apprentice", "credits": 6, "source": "Assessment pass", "status": "APPROVED"},
+            {"id": "ledger-004", "associate": "Rohan Mehta", "date": "2025-07-29", "domain": "Software", "instrument": "Mentor Check-in", "level": "Program", "credits": 2, "source": "Quarterly review", "status": "APPROVED"},
+            {"id": "ledger-005", "associate": "Ananya Rao", "date": "2025-07-18", "domain": "Data", "instrument": "PAY-201", "level": "Apprentice", "credits": 12, "source": "Course completion", "status": "PENDING"},
+        ]
 
     # Roles
     def get_roles(self) -> list[dict]:
@@ -500,6 +528,61 @@ class Repository:
         item = {"id": f"goal-{uuid.uuid4().hex[:10]}", "updated_at": datetime.now(timezone.utc).date().isoformat(), **payload}
         self._development_plans.setdefault(payload["associate_id"], []).append(item)
         return item
+
+    # ------------------------------------------------------------------
+    # Phase 6 — Engineering Excellence Committee Governance
+    # ------------------------------------------------------------------
+
+    def get_committee_overview(self) -> dict:
+        total = len(self._associates)
+        completed_assessments = [a for a in self._associate_assessments if a.status.value == "COMPLETED"]
+        total_assessments = len(self._associate_assessments)
+        completed_asm = [m for m in self._associate_asm_milestones if m.status.value == "COMPLETED"]
+        pathway_counts = {code: sum(1 for a in self._associates if a.pathway_code == code) for code in ("DE", "SE", "CSE", "IE")}
+        pathway_names = {"DE": "Data Engineering", "SE": "Software Engineering", "CSE": "Cyber Security", "IE": "Infrastructure"}
+        colors = {"DE": "bg-blue-500", "SE": "bg-emerald-500", "CSE": "bg-amber-500", "IE": "bg-slate-500"}
+        return {
+            "total_associates": total,
+            "assessment_progress": round(len(completed_assessments) / total_assessments * 100) if total_assessments else 0,
+            "pathway_distribution": [{"label": pathway_names[code], "value": round(count / total * 100) if total else 0, "color": colors[code]} for code, count in pathway_counts.items() if count],
+            "asm_completion": round(len(completed_asm) / len(self._associate_asm_milestones) * 100) if self._associate_asm_milestones else 0,
+            "at_risk": sum(1 for a in self._associates if a.standing.value in ("AT_RISK", "BLOCKED")),
+            "pending_waivers": sum(1 for w in self._waivers if w["status"] == "PENDING_REVIEW"),
+            "commission_ready": 1,
+            "audit_events": [
+                {"title": "Question rotation completed", "detail": "WF-101 live sample rotated and approved by the standards council.", "time": "2h ago", "tone": "bg-emerald-500"},
+                {"title": "Waiver entered review", "detail": "Ananya Rao · DATA-201 acceleration request is awaiting decision.", "time": "5h ago", "tone": "bg-amber-500"},
+                {"title": "ASM standard updated", "detail": "ASM-202 rubric now includes incident command evidence.", "time": "Yesterday", "tone": "bg-blue-500"},
+                {"title": "Ledger reconciliation passed", "detail": "All credit entries matched their source instruments for the latest run.", "time": "2d ago", "tone": "bg-slate-500"},
+            ],
+        }
+
+    def get_question_bank(self) -> list[dict]: return list(self._question_bank)
+    def get_asm_library(self) -> list[dict]: return list(self._asm_library)
+    def get_governance_waivers(self) -> list[dict]:
+        return [{"id": w["id"], "associate": w["associate"], "course": w["eligible_course"], "milestone": w["current_milestone"], "mentor_recommendation": w["mentor_recommendation"] or "Awaiting mentor", "system_reason": w["reason"], "status": "PENDING" if w["status"] == "PENDING_REVIEW" else ("APPROVED" if w["mentor_recommendation"] == "RECOMMEND" else "REJECTED"), "history": w["history"]} for w in self._waivers]
+    def get_difficulty_engine(self) -> list[dict]: return list(self._difficulty_engine)
+    def get_ledger_audit(self) -> list[dict]: return list(self._ledger_audit)
+
+    def update_governance(self, area: str, item_id: str, action: str) -> Optional[dict]:
+        collections = {"question-bank": self._question_bank, "asm-library": self._asm_library, "difficulty": self._difficulty_engine}
+        collection = collections.get(area)
+        if collection is None and area == "waivers":
+            for waiver in self._waivers:
+                if waiver["id"] == item_id:
+                    waiver["status"] = "MENTOR_RECOMMENDED" if action == "approve" else "MENTOR_DECLINED" if action == "reject" else waiver["status"]
+                    waiver["mentor_recommendation"] = "RECOMMEND" if action == "approve" else "DO_NOT_RECOMMEND" if action == "reject" else waiver["mentor_recommendation"]
+                    waiver["history"].append({"label": "Committee decision", "detail": action.replace("-", " ").title(), "date": datetime.now(timezone.utc).date().isoformat()})
+                    return {"status": "ok", "id": item_id}
+            return None
+        if collection is None: return None
+        for item in collection:
+            if item["id"] == item_id:
+                if action == "deactivate": item["status"] = "DEACTIVATED"
+                elif action == "activate": item["status"] = "LIVE"
+                elif action == "rotate": item["last_rotation"] = datetime.now(timezone.utc).date().isoformat() if "last_rotation" in item else item.get("last_rotation")
+                return {"status": "ok", "id": item_id}
+        return None
 
     def get_waivers(self) -> list[dict]:
         return list(self._waivers)

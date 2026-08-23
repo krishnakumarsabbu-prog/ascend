@@ -19,8 +19,8 @@ const navByRole: Record<RoleId, { group: string; items: NavItem[] }[]> = {
     { group: 'Guidance', items: [{ label: 'Pathway Panel', icon: Route, to: '/pathways' }, { label: 'ASM Reviews', icon: GitBranch, to: '/asm' }, { label: 'Waiver Recommendations', icon: ShieldCheck, to: '/mentor' }, { label: 'Architect Board Panel', icon: Network }] },
   ],
   ENGINEERING_EXCELLENCE_COMMITTEE: [
-    { group: 'Governance', items: [{ label: 'Cohort Overview', icon: Users }, { label: 'Pathway Panel', icon: Route, to: '/pathways' }, { label: 'Assessment Setup', icon: Settings2 }] },
-    { group: 'Standards', items: [{ label: 'Question Bank', icon: BookOpen }, { label: 'ASM Library', icon: GitBranch, to: '/asm' }, { label: 'Waiver Requests', icon: ShieldCheck }, { label: 'Difficulty Engine', icon: Target }, { label: 'Ledger Audit', icon: Coins }] },
+    { group: 'Governance', items: [{ label: 'Cohort Overview', icon: Users, to: '/committee' }, { label: 'Pathway Panel', icon: Route, to: '/pathways' }, { label: 'Assessment Setup', icon: Settings2, to: '/committee?view=questions' }] },
+    { group: 'Standards', items: [{ label: 'Question Bank', icon: BookOpen, to: '/committee?view=questions' }, { label: 'ASM Library', icon: GitBranch, to: '/committee?view=asm' }, { label: 'Waiver Requests', icon: ShieldCheck, to: '/committee?view=waivers' }, { label: 'Difficulty Engine', icon: Target, to: '/committee?view=difficulty' }, { label: 'Ledger Audit', icon: Coins, to: '/committee?view=ledger' }] },
   ],
   SENIOR_LEADER_SPONSOR: [
     { group: 'Portfolio', items: [{ label: 'Demand & Pipeline', icon: BriefcaseBusiness }, { label: 'Sponsored ASM Milestones', icon: GitBranch }] },

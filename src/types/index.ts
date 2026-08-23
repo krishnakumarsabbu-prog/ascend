@@ -70,3 +70,12 @@ export interface MentorMentee { id: string; name: string; title: string; email: 
 export interface DevelopmentGoal { id: string; associate_id: string; goal: string; description: string; priority: string; target_month: number; status: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED' | 'AT_RISK'; updated_at: string }
 export interface MenteeProfile { profile: Associate; progress: { overall: number; assessment: number; asm: number }; assessment: AssociateAssessment[]; pathway: AssociatePathway | null; asm: ASMDetail[]; credits: CreditEntry[]; development_plan: DevelopmentGoal[]; mentor_notes: { id: string; author: string; text: string; created_at: string }[] }
 export interface Waiver { id: string; associate_id: string; associate: string; current_milestone: string; eligible_course: string; system_recommendation: string; reason: string; mentor_recommendation: 'RECOMMEND' | 'DO_NOT_RECOMMEND' | null; status: 'PENDING_REVIEW' | 'MENTOR_RECOMMENDED' | 'MENTOR_DECLINED'; history: { label: string; detail: string; date: string }[] }
+
+export type GovernanceStatus = 'LIVE' | 'DRAFT' | 'DEACTIVATED' | 'PENDING' | 'APPROVED' | 'REJECTED' | 'MORE_INFO'
+export type DifficultyClass = 'Too Easy' | 'Balanced' | 'Too Difficult'
+export interface GovernanceOverview { total_associates: number; assessment_progress: number; pathway_distribution: { label: string; value: number; color: string }[]; asm_completion: number; at_risk: number; pending_waivers: number; commission_ready: number; audit_events: { title: string; detail: string; time: string; tone: string }[] }
+export interface QuestionBankRow { id: string; course: string; tier: Tier; question_count: number; coverage: number; pass_rate: number; last_rotation: string; live_sample_status: GovernanceStatus; status: GovernanceStatus }
+export interface ASMLibraryRow { id: string; code: string; milestone: string; month: number; wf_course: string; rubric_focus: string; credits: number; status: GovernanceStatus }
+export interface GovernanceWaiver { id: string; associate: string; course: string; milestone: string; mentor_recommendation: string; system_reason: string; status: GovernanceStatus; history: { label: string; detail: string; date: string }[] }
+export interface DifficultyRow { id: string; course: string; tier: Tier; average_score: number; pass_rate: number; difficulty: DifficultyClass; calibration: number }
+export interface LedgerAuditRow { id: string; associate: string; date: string; domain: string; instrument: string; level: string; credits: number; source: string; status: GovernanceStatus }
