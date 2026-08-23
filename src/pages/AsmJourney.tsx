@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowRight, Award, Check, CheckCircle2, ChevronRight, CircleAlert, Clock3, Cloud, Code2, ExternalLink, GitBranch, LockKeyhole, MessageSquare, Play, Plus, Send, ShieldCheck, Sparkles, Target, UserRound, X, Zap } from 'lucide-react'
+import { ArrowRight, Award, Check, CircleCheck as CheckCircle2, ChevronRight, CircleAlert, Clock3, Cloud, Code as Code2, ExternalLink, GitBranch, LockKeyhole, MessageSquare, Play, Plus, Send, ShieldCheck, Sparkles, Target, UserRound, X, Zap } from 'lucide-react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import type { ASMDetail, ASMMilestoneStatus, ASMReviewDecision, AssociateASMDetail, CommissioningPath } from '../types'
