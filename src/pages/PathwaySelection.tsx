@@ -1,10 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import {
-  AlertTriangle, ArrowRight, BarChart3, Brain, CheckCircle2, ChevronRight,
-  Clock3, Cpu, Database, FileCheck, Gavel, History, Lightbulb,
-  Network, Scale, Shield, ShieldCheck, Sparkles, TrendingUp, User, Users,
-} from 'lucide-react'
+import { TriangleAlert as AlertTriangle, ArrowRight, ChartBar as BarChart3, Brain, CircleCheck as CheckCircle2, ChevronRight, Clock3, Cpu, Database, FileCheck, Gavel, History, Lightbulb, Network, Scale, Shield, ShieldCheck, Sparkles, TrendingUp, User, Users } from 'lucide-react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from '../lib/api'
 import type { AlignmentState, CommitteeStatus, MentorReview, PathwayRecommendation, PathwayScore } from '../types'
