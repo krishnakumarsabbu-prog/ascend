@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { ArrowUpRight, BarChart3, CheckCircle2, ChevronRight, CircleAlert, Clock3, FileCheck2, GitBranch, Layers3, ShieldCheck, Users, Zap } from 'lucide-react'
+import { ArrowUpRight, ChartBar as BarChart3, CircleCheck as CheckCircle2, ChevronRight, CircleAlert, Clock3, FileCheck2, GitBranch, Layers as Layers3, ShieldCheck, Users, Zap } from 'lucide-react'
 import type { Associate, RoleId } from '../types'
 import { Badge, Button, Card, ProgressBar } from '../components/ui'
 

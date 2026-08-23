@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Bell, BookOpen, BriefcaseBusiness, ChevronDown, ChevronLeft, ChevronRight, CircleHelp, ClipboardCheck, Code2, Coins, GitBranch, GraduationCap, LayoutDashboard, Menu, Network, PanelLeft, Route, Search, Settings2, ShieldCheck, Sparkles, Target, Users, X } from 'lucide-react'
+import { Bell, BookOpen, BriefcaseBusiness, ChevronDown, ChevronLeft, ChevronRight, CircleHelp, ClipboardCheck, Code as Code2, Coins, GitBranch, GraduationCap, LayoutDashboard, Menu, Network, PanelLeft, Route, Search, Settings2, ShieldCheck, Sparkles, Target, Users, X } from 'lucide-react'
 import type { RoleId, User } from '../types'
 import { Button } from './ui'
 
