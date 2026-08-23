@@ -92,6 +92,23 @@ class Repository:
         }
         self._asm_reviews: dict[str, ASMReview] = {}
         self._asm_evidence: dict[str, list[ASMEvidence]] = {}
+        self._development_plans: dict[str, list[dict]] = {
+            "as-ananya": [
+                {"id": "goal-ananya-1", "associate_id": "as-ananya", "goal": "Lead a production data integration", "description": "Own the design review and delivery of the next payments data integration.", "priority": "High", "target_month": 10, "status": "IN_PROGRESS", "updated_at": "2025-08-12"},
+                {"id": "goal-ananya-2", "associate_id": "as-ananya", "goal": "Strengthen operational storytelling", "description": "Present a concise incident review with clear trade-offs and follow-up ownership.", "priority": "Medium", "target_month": 9, "status": "NOT_STARTED", "updated_at": "2025-08-08"},
+            ],
+            "as-rohan": [
+                {"id": "goal-rohan-1", "associate_id": "as-rohan", "goal": "Build confidence in system design", "description": "Pair on two architecture reviews and document the key decisions made.", "priority": "High", "target_month": 9, "status": "AT_RISK", "updated_at": "2025-08-14"},
+            ],
+        }
+        self._mentor_notes: dict[str, list[dict]] = {
+            "as-ananya": [{"id": "note-ananya-1", "author": "Karthik Iyer", "text": "Strong momentum on delivery. Use the next check-in to unblock the database milestone.", "created_at": "2025-08-15"}],
+            "as-rohan": [{"id": "note-rohan-1", "author": "Vikram Desai", "text": "Needs a tighter weekly rhythm around the assessment backlog.", "created_at": "2025-08-13"}],
+        }
+        self._waivers: list[dict] = [
+            {"id": "waiver-1", "associate_id": "as-ananya", "associate": "Ananya Rao", "current_milestone": "ASM-101 · Foundation Build", "eligible_course": "DATA-201 · Distributed Data Systems", "system_recommendation": "Recommend review", "reason": "ASM-101 was cleared with strong evidence and an 88% WF-101 assessment score.", "mentor_recommendation": None, "status": "PENDING_REVIEW", "history": [{"label": "System suggestion", "detail": "Eligible after ASM-101 clearance", "date": "2025-03-01"}]},
+            {"id": "waiver-2", "associate_id": "as-rohan", "associate": "Rohan Mehta", "current_milestone": "ASM-101 · Foundation Build", "eligible_course": "WF-102 · Production Systems", "system_recommendation": "Recommend review", "reason": "ASM-101 was approved. A waiver review can accelerate the foundation tier while preserving mentor oversight.", "mentor_recommendation": None, "status": "PENDING_REVIEW", "history": [{"label": "System suggestion", "detail": "Eligible after ASM-101 clearance", "date": "2025-03-10"}]},
+        ]
 
     # Roles
     def get_roles(self) -> list[dict]:
@@ -437,6 +454,64 @@ class Repository:
                 ))
         history.sort(key=lambda h: h.timestamp, reverse=True)
         return history
+
+    # ------------------------------------------------------------------
+    # Phase 5 — Mentor / Coach Portal
+    # ------------------------------------------------------------------
+
+    def get_mentor_mentees(self, mentor_id: str) -> list[dict]:
+        result = []
+        for associate in self.get_associates_by_mentor(mentor_id):
+            assessments = self.get_associate_assessments(associate.id)
+            completed = [a.score for a in assessments if a.score is not None]
+            milestones = self.get_associate_asm_details(associate.id)
+            result.append({
+                "id": associate.id, "name": associate.name, "title": associate.title, "email": associate.email,
+                "pathway": associate.pathway_code, "pathway_name": self.get_pathway_by_code(associate.pathway_code).name if self.get_pathway_by_code(associate.pathway_code) else associate.pathway_code,
+                "current_month": associate.current_month, "readiness": round(self._mentor_readiness(associate.id) * 100),
+                "assessment_score": round(sum(completed) / len(completed)) if completed else 0,
+                "asm_progress": round(sum(1 for m in milestones if m.status.value == "COMPLETED") / len(milestones) * 100) if milestones else 0,
+                "pending_requests": sum(1 for w in self._waivers if w["associate_id"] == associate.id and w["status"] == "PENDING_REVIEW"),
+                "risk": "AT_RISK" if associate.standing in (Standing.AT_RISK, Standing.BLOCKED) or any(m.status.value == "AT_RISK" for m in milestones) else ("NEEDS_ATTENTION" if any(a.status.value == "IN_PROGRESS" for a in assessments) else "ON_TRACK"),
+            })
+        return result
+
+    def _mentor_readiness(self, associate_id: str) -> float:
+        assessments = self.get_associate_assessments(associate_id)
+        completed = [a.score for a in assessments if a.score is not None]
+        assessment_score = (sum(completed) / len(completed) / 100) if completed else 0
+        milestones = self.get_associate_asm_details(associate_id)
+        asm_score = sum(1 for m in milestones if m.status.value == "COMPLETED") / len(milestones) if milestones else 0
+        return round(assessment_score * 0.45 + asm_score * 0.55, 2)
+
+    def get_mentee_profile(self, associate_id: str) -> Optional[dict]:
+        associate = self.get_associate(associate_id)
+        if not associate:
+            return None
+        pathway = self.get_associate_pathway(associate_id)
+        assessments = self.get_associate_assessments(associate_id)
+        milestones = self.get_associate_asm_details(associate_id)
+        return {"profile": associate.model_dump(mode="json"), "progress": {"overall": round(self._mentor_readiness(associate_id) * 100), "assessment": round(sum(a.score for a in assessments if a.score is not None) / max(1, len([a for a in assessments if a.score is not None]))), "asm": round(sum(1 for m in milestones if m.status.value == "COMPLETED") / max(1, len(milestones)) * 100)}, "assessment": [a.model_dump(mode="json") for a in assessments], "pathway": pathway.model_dump(mode="json") if pathway else None, "asm": [m.model_dump(mode="json") for m in milestones], "credits": [c.model_dump(mode="json") for c in self.get_credits(associate_id)], "development_plan": self._development_plans.get(associate_id, []), "mentor_notes": self._mentor_notes.get(associate_id, [])}
+
+    def get_development_plan(self, associate_id: str) -> list[dict]:
+        return list(self._development_plans.get(associate_id, []))
+
+    def create_development_plan(self, payload: dict) -> dict:
+        item = {"id": f"goal-{uuid.uuid4().hex[:10]}", "updated_at": datetime.now(timezone.utc).date().isoformat(), **payload}
+        self._development_plans.setdefault(payload["associate_id"], []).append(item)
+        return item
+
+    def get_waivers(self) -> list[dict]:
+        return list(self._waivers)
+
+    def review_waiver(self, waiver_id: str, recommendation: str, mentor_id: str) -> Optional[dict]:
+        for waiver in self._waivers:
+            if waiver["id"] == waiver_id:
+                waiver["mentor_recommendation"] = recommendation
+                waiver["status"] = "MENTOR_RECOMMENDED" if recommendation == "RECOMMEND" else "MENTOR_DECLINED"
+                waiver["history"].append({"label": "Mentor review", "detail": f"{recommendation.replace('_', ' ').title()} by {self.get_user(mentor_id).name if self.get_user(mentor_id) else 'Mentor'}", "date": datetime.now(timezone.utc).date().isoformat()})
+                return waiver
+        return None
 
     # ------------------------------------------------------------------
     # Phase 4 — ASM Milestone Journey + Commissioning Path

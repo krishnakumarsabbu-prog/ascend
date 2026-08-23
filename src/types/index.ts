@@ -64,3 +64,9 @@ export interface ASMDetail { id: string; code: string; title: string; phase: str
 export interface AssociateASMDetail { associate_id: string; associate_name: string; milestones: ASMDetail[]; credits_earned: number; credits_target: number; current_month: number; overall_progress: number }
 export interface CommissioningStep { id: string; label: string; kind: string; status: string; month?: number; milestone_code?: string; credits?: number }
 export interface CommissioningPath { associate_id: string; associate_name: string; steps: CommissioningStep[]; commission_ready: boolean; readiness: number; completed_steps: number; total_steps: number }
+
+export type MentorRisk = 'ON_TRACK' | 'AT_RISK' | 'NEEDS_ATTENTION'
+export interface MentorMentee { id: string; name: string; title: string; email: string; pathway: string; pathway_name: string; current_month: number; readiness: number; assessment_score: number; asm_progress: number; pending_requests: number; risk: MentorRisk }
+export interface DevelopmentGoal { id: string; associate_id: string; goal: string; description: string; priority: string; target_month: number; status: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED' | 'AT_RISK'; updated_at: string }
+export interface MenteeProfile { profile: Associate; progress: { overall: number; assessment: number; asm: number }; assessment: AssociateAssessment[]; pathway: AssociatePathway | null; asm: ASMDetail[]; credits: CreditEntry[]; development_plan: DevelopmentGoal[]; mentor_notes: { id: string; author: string; text: string; created_at: string }[] }
+export interface Waiver { id: string; associate_id: string; associate: string; current_milestone: string; eligible_course: string; system_recommendation: string; reason: string; mentor_recommendation: 'RECOMMEND' | 'DO_NOT_RECOMMEND' | null; status: 'PENDING_REVIEW' | 'MENTOR_RECOMMENDED' | 'MENTOR_DECLINED'; history: { label: string; detail: string; date: string }[] }

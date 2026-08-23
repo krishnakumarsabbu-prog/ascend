@@ -1,4 +1,4 @@
-import type { ASMDetail, ASMMilestone, Associate, AssociateASMDetail, AttemptResult, AttemptSummary, CommissioningPath, Course, CreditEntry, CurriculumCourse, DashboardData, MentorReview, PathwayHistoryEntry, PathwayInfo, PathwayRecommendation, Question, Role, User } from '../types'
+import type { ASMDetail, ASMMilestone, Associate, AssociateASMDetail, AttemptResult, AttemptSummary, CommissioningPath, Course, CreditEntry, CurriculumCourse, DashboardData, DevelopmentGoal, MenteeProfile, MentorMentee, MentorReview, PathwayHistoryEntry, PathwayInfo, PathwayRecommendation, Question, Role, User, Waiver } from '../types'
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8001/api'
 
@@ -32,6 +32,12 @@ export const api = {
   reviewAsm: (milestoneId: string, payload: { associate_id: string; mentor_id: string; mentor_name: string; decision: 'APPROVED' | 'REQUEST_CHANGES' | 'REJECTED'; comments: string }) => postJson<ASMDetail>(`/asm/${milestoneId}/review`, payload),
   commissioning: (id: string) => request<CommissioningPath>(`/associates/${id}/commissioning`),
   associateCredits: (id: string) => request<CreditEntry[]>(`/associates/${id}/credits`),
+  mentorMentees: (mentorId: string) => request<MentorMentee[]>(`/mentors/${mentorId}/mentees`),
+  menteeProfile: (id: string) => request<MenteeProfile>(`/mentees/${id}`),
+  developmentPlan: (id: string) => request<DevelopmentGoal[]>(`/mentees/${id}/development-plan`),
+  createDevelopmentPlan: (payload: Omit<DevelopmentGoal, 'id' | 'updated_at'>) => postJson<DevelopmentGoal>('/development-plan', payload),
+  waivers: () => request<Waiver[]>('/waivers'),
+  reviewWaiver: (id: string, mentorId: string, recommendation: 'RECOMMEND' | 'DO_NOT_RECOMMEND') => postJson<Waiver>(`/waivers/${id}/mentor-review`, { mentor_id: mentorId, recommendation }),
 
   // Phase 2
   curriculumCourses: () => request<CurriculumCourse[]>('/curriculum/courses'),

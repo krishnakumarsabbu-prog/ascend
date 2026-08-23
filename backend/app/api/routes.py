@@ -29,6 +29,20 @@ class CurrentIndexRequest(BaseModel):
     index: int
 
 
+class DevelopmentPlanRequest(BaseModel):
+    associate_id: str
+    goal: str
+    description: str
+    priority: str
+    target_month: int
+    status: str = "NOT_STARTED"
+
+
+class WaiverReviewRequest(BaseModel):
+    mentor_id: str
+    recommendation: str
+
+
 @router.get("/health")
 def health():
     return {"status": "ok", "service": "ascend-backend", "version": "1.0.0"}
@@ -69,6 +83,52 @@ def get_dashboard(associate_id: str):
     if not dashboard:
         raise HTTPException(status_code=404, detail="Associate not found")
     return dashboard
+
+
+# ---------------------------------------------------------------------------
+# Phase 5 — Mentor / Coach Portal
+# ---------------------------------------------------------------------------
+
+@router.get("/mentors/{mentor_id}/mentees")
+def get_mentor_mentees(mentor_id: str):
+    return get_repository().get_mentor_mentees(mentor_id)
+
+
+@router.get("/mentees/{associate_id}")
+def get_mentee_profile(associate_id: str):
+    profile = get_repository().get_mentee_profile(associate_id)
+    if not profile:
+        raise HTTPException(status_code=404, detail="Mentee not found")
+    return profile
+
+
+@router.get("/mentees/{associate_id}/development-plan")
+def get_development_plan(associate_id: str):
+    if not get_repository().get_associate(associate_id):
+        raise HTTPException(status_code=404, detail="Mentee not found")
+    return get_repository().get_development_plan(associate_id)
+
+
+@router.post("/development-plan")
+def create_development_plan(body: DevelopmentPlanRequest):
+    if not get_repository().get_associate(body.associate_id):
+        raise HTTPException(status_code=404, detail="Mentee not found")
+    return get_repository().create_development_plan(body.model_dump())
+
+
+@router.get("/waivers")
+def get_waivers():
+    return get_repository().get_waivers()
+
+
+@router.post("/waivers/{waiver_id}/mentor-review")
+def review_waiver(waiver_id: str, body: WaiverReviewRequest):
+    if body.recommendation not in ("RECOMMEND", "DO_NOT_RECOMMEND"):
+        raise HTTPException(status_code=400, detail="Invalid recommendation")
+    waiver = get_repository().review_waiver(waiver_id, body.recommendation, body.mentor_id)
+    if not waiver:
+        raise HTTPException(status_code=404, detail="Waiver not found")
+    return waiver
 
 
 @router.get("/courses")

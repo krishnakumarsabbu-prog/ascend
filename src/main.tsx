@@ -11,6 +11,7 @@ import { Dashboard } from './pages/Dashboard'
 import { RoleWorkspace } from './pages/RoleWorkspace'
 import { PathwaySelection } from './pages/PathwaySelection'
 import { AsmJourney } from './pages/AsmJourney'
+import { MentorPortal } from './pages/MentorPortal'
 import type { RoleId, User } from './types'
 import './styles.css'
 
@@ -26,7 +27,7 @@ function App() {
   const dashboardQuery = useQuery({ queryKey: ['dashboard', dashboardAssociateId], queryFn: () => api.dashboard(dashboardAssociateId), enabled: Boolean(usersQuery.data && associatesQuery.data) })
 
   if (usersQuery.isError || associatesQuery.isError || rolesQuery.isError) return <ErrorScreen />
-  return <AppShell role={role} user={user} onRoleChange={setRole}><Routes><Route path="/" element={role === 'EARLY_TALENT' ? <Dashboard data={dashboardQuery.data} isLoading={dashboardQuery.isLoading} /> : <RoleWorkspace role={role} associates={associatesQuery.data || []} />} /><Route path="/pathways" element={<PathwaySelection associateId={dashboardAssociateId} />} /><Route path="/asm" element={<AsmJourney associateId={dashboardAssociateId} />} /><Route path="/curriculum" element={role === 'EARLY_TALENT' ? <Curriculum /> : <Navigate to="/" replace />} /><Route path="/assessment/:courseId" element={role === 'EARLY_TALENT' ? <Assessment /> : <Navigate to="/" replace />} /><Route path="/assessment/result/:attemptId" element={role === 'EARLY_TALENT' ? <AssessmentResult /> : <Navigate to="/" replace />} /><Route path="*" element={<Navigate to="/" replace />} /></Routes></AppShell>
+  return <AppShell role={role} user={user} onRoleChange={setRole}><Routes><Route path="/" element={role === 'EARLY_TALENT' ? <Dashboard data={dashboardQuery.data} isLoading={dashboardQuery.isLoading} /> : role === 'MENTOR_COACH' ? <MentorPortal user={user} /> : <RoleWorkspace role={role} associates={associatesQuery.data || []} />} /><Route path="/mentor" element={role === 'MENTOR_COACH' ? <MentorPortal user={user} /> : <Navigate to="/" replace />} /><Route path="/pathways" element={<PathwaySelection associateId={dashboardAssociateId} />} /><Route path="/asm" element={<AsmJourney associateId={dashboardAssociateId} />} /><Route path="/curriculum" element={role === 'EARLY_TALENT' ? <Curriculum /> : <Navigate to="/" replace />} /><Route path="/assessment/:courseId" element={role === 'EARLY_TALENT' ? <Assessment /> : <Navigate to="/" replace />} /><Route path="/assessment/result/:attemptId" element={role === 'EARLY_TALENT' ? <AssessmentResult /> : <Navigate to="/" replace />} /><Route path="*" element={<Navigate to="/" replace />} /></Routes></AppShell>
 }
 
 function ErrorScreen() { return <div className="flex min-h-screen items-center justify-center bg-slate-50 p-6"><div className="max-w-sm text-center"><div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-red-600">!</div><h1 className="mt-4 text-lg font-bold text-slate-900">ASCEND service unavailable</h1><p className="mt-2 text-sm leading-6 text-slate-500">We couldn’t load the workspace data. Please check that the application services are running and try again.</p></div></div> }

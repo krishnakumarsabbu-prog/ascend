@@ -15,8 +15,8 @@ const navByRole: Record<RoleId, { group: string; items: NavItem[] }[]> = {
     { group: 'Recognition', items: [{ label: 'Credit Ledger', icon: Coins }] },
   ],
   MENTOR_COACH: [
-    { group: 'Workspace', items: [{ label: 'My Mentees', icon: Users, badge: '4' }, { label: 'Mentee Requests', icon: Bell, badge: '2' }, { label: 'Development Plan', icon: ClipboardCheck }] },
-    { group: 'Guidance', items: [{ label: 'Pathway Panel', icon: Route, to: '/pathways' }, { label: 'ASM Reviews', icon: GitBranch, to: '/asm' }, { label: 'Waiver Recommendations', icon: ShieldCheck }, { label: 'Architect Board Panel', icon: Network }] },
+    { group: 'Workspace', items: [{ label: 'My Mentees', icon: Users, badge: '4', to: '/mentor' }, { label: 'Mentee Requests', icon: Bell, badge: '2', to: '/mentor' }, { label: 'Development Plan', icon: ClipboardCheck, to: '/mentor' }] },
+    { group: 'Guidance', items: [{ label: 'Pathway Panel', icon: Route, to: '/pathways' }, { label: 'ASM Reviews', icon: GitBranch, to: '/asm' }, { label: 'Waiver Recommendations', icon: ShieldCheck, to: '/mentor' }, { label: 'Architect Board Panel', icon: Network }] },
   ],
   ENGINEERING_EXCELLENCE_COMMITTEE: [
     { group: 'Governance', items: [{ label: 'Cohort Overview', icon: Users }, { label: 'Pathway Panel', icon: Route, to: '/pathways' }, { label: 'Assessment Setup', icon: Settings2 }] },
