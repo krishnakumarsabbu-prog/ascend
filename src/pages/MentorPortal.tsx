@@ -1,6 +1,6 @@
 import { type ReactNode, useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { ArrowLeft, ArrowUpRight, Check, ChevronRight, CircleAlert, ClipboardList, Flag, Layers3, Plus, ShieldCheck, Target, UserRound, X } from 'lucide-react'
+import { ArrowLeft, ArrowUpRight, Check, ChevronRight, CircleAlert, ClipboardList, Flag, Layers as Layers3, Plus, ShieldCheck, Target, UserRound, X } from 'lucide-react'
 import { api } from '../lib/api'
 import type { DevelopmentGoal, MentorMentee, User, Waiver } from '../types'
 import { Badge, Button, Card, ProgressBar, Skeleton } from '../components/ui'
