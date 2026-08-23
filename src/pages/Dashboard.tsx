@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { ArrowUpRight, CalendarDays, Check, ChevronRight, CircleAlert, Clock3, GitBranch, Layers3, MoreHorizontal, Play, ShieldCheck, Sparkles, Target, UserRound } from 'lucide-react'
+import { ArrowUpRight, CalendarDays, Check, ChevronRight, CircleAlert, Clock3, GitBranch, Layers as Layers3, MoveHorizontal as MoreHorizontal, Play, ShieldCheck, Sparkles, Target, UserRound } from 'lucide-react'
 import type { DashboardData, MilestoneStatus, NextAction } from '../types'
 import { Badge, Button, Card, ProgressBar, Skeleton } from '../components/ui'
 import { percent } from '../lib/utils'
