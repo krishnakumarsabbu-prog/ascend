@@ -13,10 +13,13 @@ from app.models.schemas import (
     AssociatePathway,
     AttemptResult,
     AttemptSummary,
+    CommitteeDecision,
     Course,
     CreditEntry,
     CurriculumCourse,
     DomainScore,
+    MentorReview,
+    PathwayHistoryEntry,
     PerformanceInsight,
     Question,
     Tier,
@@ -71,6 +74,9 @@ class Repository:
         self._curriculum_courses: list[CurriculumCourse] = seed_curriculum_courses()
         self._questions: list[Question] = seed_questions()
         self._attempts: dict[str, dict] = {}
+        # Phase 3
+        self._mentor_reviews: dict[str, MentorReview] = {}
+        self._committee_decisions: list[CommitteeDecision] = []
 
     # Roles
     def get_roles(self) -> list[dict]:
@@ -384,6 +390,38 @@ class Repository:
             insights=insights,
             completed_at=attempt.get("completed_at") or datetime.now(timezone.utc),
         )
+
+
+    # ------------------------------------------------------------------
+    # Phase 3 — Mentor Reviews & Committee Decisions
+    # ------------------------------------------------------------------
+
+    def save_mentor_review(self, review: MentorReview) -> None:
+        self._mentor_reviews[review.associate_id] = review
+
+    def get_mentor_review(self, associate_id: str) -> Optional[MentorReview]:
+        return self._mentor_reviews.get(associate_id)
+
+    def save_committee_decision(self, decision: CommitteeDecision) -> None:
+        self._committee_decisions.append(decision)
+
+    def get_pathway_history(self, associate_id: str) -> list[PathwayHistoryEntry]:
+        history: list[PathwayHistoryEntry] = []
+        for d in self._committee_decisions:
+            if d.associate_id == associate_id:
+                mentor_rec = self._mentor_reviews.get(associate_id)
+                history.append(PathwayHistoryEntry(
+                    id=d.id,
+                    associate_id=d.associate_id,
+                    system_recommendation=d.system_recommendation,
+                    mentor_recommendation=mentor_rec.recommended_pathway if mentor_rec else None,
+                    committee_decision=d.committee_decision,
+                    reason=d.reason,
+                    timestamp=d.timestamp,
+                    status=d.status,
+                ))
+        history.sort(key=lambda h: h.timestamp, reverse=True)
+        return history
 
 
 # Module-level singleton so data persists across requests within a process.

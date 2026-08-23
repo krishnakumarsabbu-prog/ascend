@@ -1,4 +1,4 @@
-import type { ASMMilestone, Associate, AttemptResult, AttemptSummary, Course, CreditEntry, CurriculumCourse, DashboardData, Question, Role, User } from '../types'
+import type { ASMMilestone, Associate, AttemptResult, AttemptSummary, Course, CreditEntry, CurriculumCourse, DashboardData, MentorReview, PathwayHistoryEntry, PathwayInfo, PathwayRecommendation, Question, Role, User } from '../types'
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8001/api'
 
@@ -36,4 +36,11 @@ export const api = {
   setCurrentIndex: (attemptId: string, index: number) => postJson<{ status: string }>(`/assessments/${attemptId}/current`, { index }),
   submitAssessment: (attemptId: string) => postJson<AttemptResult>(`/assessments/${attemptId}/submit`, {}),
   getAssessmentResult: (attemptId: string) => request<AttemptResult>(`/assessments/${attemptId}/result`),
+
+  // Phase 3
+  pathways: () => request<PathwayInfo[]>('/pathways'),
+  pathwayRecommendation: (associateId: string) => request<PathwayRecommendation>(`/pathways/recommendation/${associateId}`),
+  submitMentorReview: (review: { associate_id: string; mentor_id: string; mentor_name: string; recommended_pathway: string; confidence: number; strengths: string; concerns: string; comments: string }) => postJson<MentorReview>('/pathways/mentor-review', review),
+  submitCommitteeDecision: (decision: { associate_id: string; system_recommendation: string; mentor_recommendation: string; committee_decision: string; reason: string; status: string }) => postJson<{ id: string }>('/pathways/committee-decision', decision),
+  pathwayHistory: (associateId: string) => request<PathwayHistoryEntry[]>(`/pathways/history/${associateId}`),
 }

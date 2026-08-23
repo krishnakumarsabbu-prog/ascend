@@ -322,3 +322,94 @@ class AttemptResult(BaseModel):
     tier_performance: List[TierPerformance]
     insights: PerformanceInsight
     completed_at: datetime
+
+
+# ---------------------------------------------------------------------------
+# Phase 3 — Pathway Selection & Recommendation Engine
+# ---------------------------------------------------------------------------
+
+class PathwayInfo(BaseModel):
+    id: str
+    code: str
+    name: str
+    description: str
+    focus: str
+    duration_months: int
+    total_credits: int
+
+
+class SkillContribution(BaseModel):
+    skill: str
+    domain: str
+    percentage: float
+    weight: float
+    contribution: float
+
+
+class PathwayScore(BaseModel):
+    pathway_code: str
+    pathway_name: str
+    score: float
+    normalized_score: float
+    confidence: float
+    rank: int
+    contributing_skills: List[SkillContribution]
+
+
+class AssessmentPerformance(BaseModel):
+    assessment_id: str
+    assessment_title: str
+    status: str
+    score: Optional[int] = None
+    domain: str
+
+
+class PathwayRecommendation(BaseModel):
+    associate_id: str
+    associate_name: str
+    assessment_performance: List[AssessmentPerformance]
+    ranked_pathways: List[PathwayScore]
+    system_recommendation: PathwayScore
+    weights: dict
+    generated_at: datetime
+
+
+class MentorReview(BaseModel):
+    associate_id: str
+    mentor_id: str
+    mentor_name: str
+    recommended_pathway: str
+    confidence: float
+    strengths: str
+    concerns: str
+    comments: str
+    submitted_at: datetime
+
+
+class CommitteeDecision(BaseModel):
+    id: str
+    associate_id: str
+    system_recommendation: str
+    mentor_recommendation: str
+    committee_decision: str
+    reason: str
+    timestamp: datetime
+    status: str
+
+
+class Reconciliation(BaseModel):
+    system_recommendation: str
+    mentor_recommendation: Optional[str]
+    alignment: str
+    reason: str
+
+
+class PathwayHistoryEntry(BaseModel):
+    id: str
+    associate_id: str
+    system_recommendation: str
+    mentor_recommendation: Optional[str]
+    committee_decision: str
+    reason: str
+    timestamp: datetime
+    status: str

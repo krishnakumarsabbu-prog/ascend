@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from app.repositories.repository import get_repository
 from app.services.dashboard_service import DashboardService
 from app.services.assessment_service import AssessmentService
+from app.services.pathway_service import PathwayService
 
 router = APIRouter(prefix="/api", tags=["ascend"])
 
@@ -195,3 +196,104 @@ def get_assessment_result(attempt_id: str):
     if not result:
         raise HTTPException(status_code=404, detail="Result not available")
     return result
+
+
+# ---------------------------------------------------------------------------
+# Phase 3 — Pathway Selection & Recommendation Engine
+# ---------------------------------------------------------------------------
+
+class MentorReviewRequest(BaseModel):
+    associate_id: str
+    mentor_id: str
+    mentor_name: str
+    recommended_pathway: str
+    confidence: float
+    strengths: str
+    concerns: str
+    comments: str
+
+
+class CommitteeDecisionRequest(BaseModel):
+    associate_id: str
+    system_recommendation: str
+    mentor_recommendation: str = ""
+    committee_decision: str
+    reason: str
+    status: str = "CONFIRMED"
+
+
+@router.get("/pathways")
+def get_pathways():
+    repo = get_repository()
+    service = PathwayService(repo)
+    return service.get_pathways()
+
+
+@router.get("/pathways/recommendation/{associate_id}")
+def get_pathway_recommendation(associate_id: str):
+    repo = get_repository()
+    service = PathwayService(repo)
+    recommendation = service.get_recommendation(associate_id)
+    if not recommendation:
+        raise HTTPException(status_code=404, detail="Associate not found")
+    # Attach mentor review and reconciliation if available
+    mentor_review = service.get_mentor_review(associate_id)
+    system_code = recommendation.system_recommendation.pathway_code if recommendation.system_recommendation else ""
+    mentor_code = mentor_review.recommended_pathway if mentor_review else None
+    reconciliation = service.reconcile(system_code, mentor_code)
+    return {
+        **recommendation.model_dump(),
+        "mentor_review": mentor_review.model_dump() if mentor_review else None,
+        "reconciliation": reconciliation.model_dump(),
+    }
+
+
+@router.post("/pathways/mentor-review")
+def submit_mentor_review(body: MentorReviewRequest):
+    repo = get_repository()
+    service = PathwayService(repo)
+    from datetime import datetime, timezone
+    review = MentorReview(
+        associate_id=body.associate_id,
+        mentor_id=body.mentor_id,
+        mentor_name=body.mentor_name,
+        recommended_pathway=body.recommended_pathway,
+        confidence=body.confidence,
+        strengths=body.strengths,
+        concerns=body.concerns,
+        comments=body.comments,
+        submitted_at=datetime.now(timezone.utc),
+    )
+    saved = service.save_mentor_review(review)
+    # Return reconciliation alongside the review
+    recommendation = service.get_recommendation(body.associate_id)
+    system_code = recommendation.system_recommendation.pathway_code if recommendation and recommendation.system_recommendation else ""
+    reconciliation = service.reconcile(system_code, saved.recommended_pathway)
+    return {**saved.model_dump(), "reconciliation": reconciliation.model_dump()}
+
+
+@router.post("/pathways/committee-decision")
+def submit_committee_decision(body: CommitteeDecisionRequest):
+    repo = get_repository()
+    service = PathwayService(repo)
+    from datetime import datetime, timezone
+    import uuid
+    decision = CommitteeDecision(
+        id=f"cd-{uuid.uuid4().hex[:12]}",
+        associate_id=body.associate_id,
+        system_recommendation=body.system_recommendation,
+        mentor_recommendation=body.mentor_recommendation,
+        committee_decision=body.committee_decision,
+        reason=body.reason,
+        timestamp=datetime.now(timezone.utc),
+        status=body.status,
+    )
+    saved = service.save_committee_decision(decision)
+    return saved.model_dump()
+
+
+@router.get("/pathways/history/{associate_id}")
+def get_pathway_history(associate_id: str):
+    repo = get_repository()
+    service = PathwayService(repo)
+    return service.get_history(associate_id)

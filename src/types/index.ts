@@ -29,3 +29,27 @@ export interface DomainScore { domain: string; total: number; correct: number; i
 export interface TierPerformance { tier: string; total: number; correct: number; incorrect: number; skipped: number; percentage: number }
 export interface PerformanceInsight { strongest_area: string; improvement_area: string; recommended_next_action: string }
 export interface AttemptResult { attempt_id: string; course_id: string; course_code: string; course_name: string; associate_id: string; status: string; score: number; correct: number; incorrect: number; skipped: number; total_questions: number; passing_score: number; passed: boolean; gate_status: string; domain_scores: DomainScore[]; tier_performance: TierPerformance[]; insights: PerformanceInsight; completed_at: string }
+
+// Phase 3 — Pathway Selection & Recommendation Engine
+export type PathwayCode = 'DE' | 'SE' | 'CSE' | 'IE'
+export type AlignmentState = 'ALIGNED' | 'PARTIALLY_ALIGNED' | 'DIVERGENT' | 'PENDING'
+export type CommitteeStatus = 'CONFIRMED' | 'OVERRIDE' | 'REQUEST_REVIEW'
+
+export interface PathwayInfo { id: string; code: string; name: string; description: string; focus: string; duration_months: number; total_credits: number }
+export interface SkillContribution { skill: string; domain: string; percentage: number; weight: number; contribution: number }
+export interface PathwayScore { pathway_code: string; pathway_name: string; score: number; normalized_score: number; confidence: number; rank: number; contributing_skills: SkillContribution[] }
+export interface AssessmentPerformance { assessment_id: string; assessment_title: string; status: string; score?: number; domain: string }
+export interface MentorReview { associate_id: string; mentor_id: string; mentor_name: string; recommended_pathway: string; confidence: number; strengths: string; concerns: string; comments: string; submitted_at: string }
+export interface Reconciliation { system_recommendation: string; mentor_recommendation: string | null; alignment: AlignmentState; reason: string }
+export interface PathwayRecommendation {
+  associate_id: string
+  associate_name: string
+  assessment_performance: AssessmentPerformance[]
+  ranked_pathways: PathwayScore[]
+  system_recommendation: PathwayScore
+  weights: { domain_weights: Record<string, Record<string, number>>; domain_scale: Record<string, number> }
+  generated_at: string
+  mentor_review: MentorReview | null
+  reconciliation: Reconciliation
+}
+export interface PathwayHistoryEntry { id: string; associate_id: string; system_recommendation: string; mentor_recommendation: string | null; committee_decision: string; reason: string; timestamp: string; status: CommitteeStatus }

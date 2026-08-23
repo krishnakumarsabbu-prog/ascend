@@ -239,9 +239,9 @@ class DashboardService:
 
     def _fallback_pathway(self, associate: Associate) -> AssociatePathway:
         return AssociatePathway(
-            pathway_id="p-payments",
-            code=associate.pathway_code or "PAY-ENG",
-            name="Payments Engineering Pathway",
+            pathway_id="p-de",
+            code=associate.pathway_code or "DE",
+            name="Data Engineering",
             status="ACTIVE",
             progress=0.0,
             started_at=__import__("datetime").datetime(2025, 1, 6, tzinfo=__import__("datetime").timezone.utc),
