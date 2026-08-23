@@ -1,22 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
-import {
-  AlertTriangle,
-  ArrowUpRight,
-  Briefcase,
-  CheckCircle2,
-  ChevronRight,
-  Gauge,
-  GitBranch,
-  Layers3,
-  Lightbulb,
-  ShieldCheck,
-  TrendingDown,
-  TrendingUp,
-  Users,
-  Zap,
-} from 'lucide-react'
+import { TriangleAlert as AlertTriangle, ArrowUpRight, Briefcase, CircleCheck as CheckCircle2, ChevronRight, Gauge, GitBranch, Layers as Layers3, Lightbulb, ShieldCheck, TrendingDown, TrendingUp, Users, Zap } from 'lucide-react'
 import { api } from '../lib/api'
 import type { Recommendation, SponsoredASM, TeamPipeline, WorkforceRisk } from '../types'
 import { Badge, Card, ProgressBar, Skeleton } from '../components/ui'
