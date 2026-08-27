@@ -37,7 +37,8 @@ class ASMService:
         milestones = self.repo.get_associate_asm_details(associate_id)
         credits_earned = self.repo.get_credit_balance(associate_id)
         pathway = self.repo.get_associate_pathway(associate_id)
-        credits_target = pathway.total_credits if pathway else 120
+        pathway_obj = self.repo.get_pathway_by_code(associate.pathway_code) if associate.pathway_code else None
+        credits_target = getattr(pathway, 'total_credits', None) or (pathway_obj.total_credits if pathway_obj else 120)
 
         completed = sum(1 for m in milestones if m.status == ASMMilestoneStatus.COMPLETED)
         total = len(milestones)

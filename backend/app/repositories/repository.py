@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
+
 from typing import Optional
 import uuid
 
@@ -26,10 +27,12 @@ from app.models.schemas import (
     PathwayHistoryEntry,
     PerformanceInsight,
     Question,
+    QuestionOption,
     Tier,
     TierPerformance,
     Pathway,
     Role,
+    Standing,
     Team,
     User,
 )
@@ -102,40 +105,88 @@ class Repository:
             ],
         }
         self._mentor_notes: dict[str, list[dict]] = {
-            "as-ananya": [{"id": "note-ananya-1", "author": "Karthik Iyer", "text": "Strong momentum on delivery. Use the next check-in to unblock the database milestone.", "created_at": "2025-08-15"}],
+            "as-ananya": [{"id": "note-ananya-1", "author": "Priya Nair", "text": "Strong momentum on delivery. Use the next check-in to unblock the database milestone.", "created_at": "2025-08-15"}],
+            "as-fatima": [{"id": "note-fatima-1", "author": "Priya Nair", "text": "Fatima is tracking well for the DE fork reconciliation.", "created_at": "2025-08-16"}],
             "as-rohan": [{"id": "note-rohan-1", "author": "Vikram Desai", "text": "Needs a tighter weekly rhythm around the assessment backlog.", "created_at": "2025-08-13"}],
         }
         self._waivers: list[dict] = [
-            {"id": "waiver-1", "associate_id": "as-ananya", "associate": "Ananya Rao", "current_milestone": "ASM-101 · Foundation Build", "eligible_course": "DATA-201 · Distributed Data Systems", "system_recommendation": "Recommend review", "reason": "ASM-101 was cleared with strong evidence and an 88% WF-101 assessment score.", "mentor_recommendation": None, "status": "PENDING_REVIEW", "history": [{"label": "System suggestion", "detail": "Eligible after ASM-101 clearance", "date": "2025-03-01"}]},
-            {"id": "waiver-2", "associate_id": "as-rohan", "associate": "Rohan Mehta", "current_milestone": "ASM-101 · Foundation Build", "eligible_course": "WF-102 · Production Systems", "system_recommendation": "Recommend review", "reason": "ASM-101 was approved. A waiver review can accelerate the foundation tier while preserving mentor oversight.", "mentor_recommendation": None, "status": "PENDING_REVIEW", "history": [{"label": "System suggestion", "detail": "Eligible after ASM-101 clearance", "date": "2025-03-10"}]},
+            {"id": "waiver-fatima", "associate_id": "as-fatima", "associate": "Fatima Sheikh", "current_milestone": "WF-101 Java 21 & Secure AI Prompting", "eligible_course": "Associate-initiated (Pre-Assessment opt-in)", "system_recommendation": "Recommend review", "reason": "When a mentee clears an ASM milestone, the system automatically suggests waiving the next tier of the matching WF course. As mentor, you confirm genuine readiness before it moves to the Engineering Excellence Committee.", "mentor_recommendation": "RECOMMEND", "status": "PENDING_REVIEW", "history": [{"label": "System suggestion", "detail": "Eligible after Foundational milestone", "date": "2025-08-01"}]},
+            {"id": "waiver-ananya", "associate_id": "as-ananya", "associate": "Ananya Rao", "current_milestone": "ASM-101 · Foundation Build", "eligible_course": "WF-102 Spring Boot & Data Integrity", "system_recommendation": "Recommend review", "reason": "ASM-101 was cleared with strong evidence and an 88% WF-101 assessment score.", "mentor_recommendation": None, "status": "PENDING_REVIEW", "history": [{"label": "System suggestion", "detail": "Eligible after ASM-101 clearance", "date": "2025-03-01"}]},
         ]
         self._question_bank = [
-            {"id": "qb-wf101-basic", "course": "WF-101 Engineering Foundations", "tier": "Basic", "question_count": 48, "coverage": 96, "pass_rate": 91, "last_rotation": "18 Aug 2025", "live_sample_status": "LIVE", "status": "LIVE"},
-            {"id": "qb-wf102-novice", "course": "WF-102 Production Systems", "tier": "Novice", "question_count": 42, "coverage": 88, "pass_rate": 84, "last_rotation": "12 Aug 2025", "live_sample_status": "LIVE", "status": "LIVE"},
-            {"id": "qb-pay201-apprentice", "course": "PAY-201 Payments Domain", "tier": "Apprentice", "question_count": 36, "coverage": 79, "pass_rate": 76, "last_rotation": "02 Aug 2025", "live_sample_status": "LIVE", "status": "LIVE"},
-            {"id": "qb-data201-expert", "course": "DATA-201 Distributed Data", "tier": "Expert", "question_count": 28, "coverage": 72, "pass_rate": 68, "last_rotation": "21 Jul 2025", "live_sample_status": "DRAFT", "status": "DRAFT"},
-            {"id": "qb-arch301-master", "course": "ARCH-301 System Architecture", "tier": "Master", "question_count": 18, "coverage": 93, "pass_rate": 61, "last_rotation": "28 Jul 2025", "live_sample_status": "LIVE", "status": "LIVE"},
+            {"id": "qb-wf101-basic", "course": "WF-101 Java 21 & Secure AI Prompting", "tier": "Basic", "question_count": 100, "coverage": 100, "pass_rate": 91, "last_rotation": "Q2 2026", "live_sample_status": "LIVE", "status": "LIVE"},
+            {"id": "qb-wf102-novice", "course": "WF-102 Spring Boot & Data Integrity", "tier": "Novice", "question_count": 100, "coverage": 100, "pass_rate": 84, "last_rotation": "Q2 2026", "live_sample_status": "LIVE", "status": "LIVE"},
+            {"id": "qb-wf103-apprentice", "course": "WF-103 Spring Security & Cloud Foundations", "tier": "Apprentice", "question_count": 100, "coverage": 100, "pass_rate": 79, "last_rotation": "Q2 2026", "live_sample_status": "LIVE", "status": "LIVE"},
+            {"id": "qb-wf104-expert", "course": "WF-104 Event Integration & Observability", "tier": "Expert", "question_count": 100, "coverage": 100, "pass_rate": 72, "last_rotation": "Q1 2026", "live_sample_status": "DRAFT", "status": "DRAFT"},
+            {"id": "qb-wf203-master", "course": "WF-203 Spring AI & Enterprise RAG", "tier": "Master", "question_count": 100, "coverage": 100, "pass_rate": 68, "last_rotation": "Q2 2026", "live_sample_status": "LIVE", "status": "LIVE"},
+        ]
+        self._bank_coverage = [
+            {"id": "bc-wf101", "course": "WF-101 Java 21 & Secure AI Prompting", "basic": 100, "novice": 100, "apprentice": 100, "expert": 100, "master": 100, "total": 500, "live_sample_status": "Yes"},
+            {"id": "bc-wf102", "course": "WF-102 Spring Boot & Data Integrity", "basic": 100, "novice": 100, "apprentice": 100, "expert": 100, "master": 100, "total": 500, "live_sample_status": "Yes"},
+            {"id": "bc-wf103", "course": "WF-103 Spring Security & Cloud Foundations", "basic": 100, "novice": 100, "apprentice": 100, "expert": 100, "master": 100, "total": 500, "live_sample_status": "Yes"},
+            {"id": "bc-wf104", "course": "WF-104 Event Integration & Observability", "basic": 100, "novice": 100, "apprentice": 100, "expert": 100, "master": 100, "total": 500, "live_sample_status": "Bank pending"},
+            {"id": "bc-wf201", "course": "WF-201 Microservices at Cloud Scale", "basic": 100, "novice": 100, "apprentice": 100, "expert": 100, "master": 100, "total": 500, "live_sample_status": "Bank pending"},
+            {"id": "bc-wf202", "course": "WF-202 Distributed Resilience Engineering", "basic": 100, "novice": 100, "apprentice": 100, "expert": 100, "master": 100, "total": 500, "live_sample_status": "Bank pending"},
+            {"id": "bc-wf203", "course": "WF-203 Spring AI & Enterprise RAG", "basic": 100, "novice": 100, "apprentice": 100, "expert": 100, "master": 100, "total": 500, "live_sample_status": "Yes"},
+        ]
+        self._admin_questions = [
+            {"id": "q1", "number": 1, "question": "What is the JVM primarily responsible for?", "correct_answer": "Executing compiled Java bytecode and managing memory/runtime resources"},
+            {"id": "q2", "number": 2, "question": "What does the Java Stream API let you do?", "correct_answer": "Process sequences of elements with functional-style operations like map and filter"},
+            {"id": "q3", "number": 3, "question": "Why should a developer set boundaries on AI coding-assistant prompts?", "correct_answer": "To prevent leaking proprietary code or sensitive data into external prompts"},
+            {"id": "q4", "number": 4, "question": "What is a \"memory leak\" in a Java application?", "correct_answer": "Objects that are no longer needed but remain reachable, preventing garbage collection"},
+            {"id": "q5", "number": 5, "question": "What does \"IP\" refer to in secure AI prompting rules at a bank?", "correct_answer": "Intellectual Property — proprietary code, data, or business logic"},
         ]
         self._asm_library = [
-            {"id": "asm-lib-101", "code": "ASM-101", "milestone": "Foundation Build", "month": 2, "wf_course": "WF-101", "rubric_focus": "Testing, CI, operational baseline", "credits": 12, "status": "LIVE"},
-            {"id": "asm-lib-102", "code": "ASM-102", "milestone": "Integration Milestone", "month": 4, "wf_course": "WF-102", "rubric_focus": "Contracts, integration, observability", "credits": 12, "status": "LIVE"},
-            {"id": "asm-lib-201", "code": "ASM-201", "milestone": "Domain Deep Build", "month": 10, "wf_course": "PAY-201 / DATA-201", "rubric_focus": "Domain depth, performance, reliability", "credits": 24, "status": "LIVE"},
-            {"id": "asm-lib-202", "code": "ASM-202", "milestone": "Operational Ownership", "month": 13, "wf_course": "WF-102", "rubric_focus": "SLOs, on-call, incident command", "credits": 18, "status": "DRAFT"},
-            {"id": "asm-lib-301", "code": "ASM-301", "milestone": "Architect Board Certification", "month": 22, "wf_course": "ARCH-301", "rubric_focus": "Trade-offs, architecture defense", "credits": 30, "status": "LIVE"},
+            {"id": "asm-lib-101", "code": "ASM-101", "milestone": "Hacker Kitchen", "month": "M3", "wf_course": "WF-101", "rubric_focus": "AI Tooling & Safety", "credits": 10, "status": "LIVE"},
+            {"id": "asm-lib-102", "code": "ASM-102", "milestone": "Database Duel", "month": "M6", "wf_course": "WF-102", "rubric_focus": "Independence", "credits": 12, "status": "LIVE"},
+            {"id": "asm-lib-103", "code": "ASM-103", "milestone": "AWS Sandbox Deploy", "month": "M9", "wf_course": "WF-103", "rubric_focus": "Cloud Resilience", "credits": 14, "status": "LIVE"},
+            {"id": "asm-lib-104", "code": "ASM-104", "milestone": "The RFC Board Defense", "month": "M12", "wf_course": "WF-104", "rubric_focus": "Independence", "credits": 16, "status": "LIVE"},
+            {"id": "asm-lib-201", "code": "ASM-201", "milestone": "Drill", "month": "M15", "wf_course": "WF-201", "rubric_focus": "Cloud Resilience", "credits": 18, "status": "LIVE"},
+            {"id": "asm-lib-202", "code": "ASM-202", "milestone": "Live Fire — Resilience Chaos Simulation", "month": "M18", "wf_course": "WF-202", "rubric_focus": "Cloud Resilience", "credits": 20, "status": "LIVE"},
+            {"id": "asm-lib-203", "code": "ASM-203", "milestone": "Capstone — Secure AI Banking Agent", "month": "M24", "wf_course": "WF-203", "rubric_focus": "AI Tooling & Safety", "credits": 30, "status": "LIVE"},
         ]
         self._difficulty_engine = [
-            {"id": "diff-wf101", "course": "WF-101 Engineering Foundations", "tier": "Basic", "average_score": 86, "pass_rate": 91, "difficulty": "Too Easy", "calibration": 2},
-            {"id": "diff-wf102", "course": "WF-102 Production Systems", "tier": "Novice", "average_score": 79, "pass_rate": 84, "difficulty": "Balanced", "calibration": 0},
-            {"id": "diff-pay201", "course": "PAY-201 Payments Domain", "tier": "Apprentice", "average_score": 74, "pass_rate": 76, "difficulty": "Balanced", "calibration": -1},
-            {"id": "diff-data201", "course": "DATA-201 Distributed Data", "tier": "Expert", "average_score": 68, "pass_rate": 68, "difficulty": "Too Difficult", "calibration": -3},
-            {"id": "diff-arch301", "course": "ARCH-301 System Architecture", "tier": "Master", "average_score": 65, "pass_rate": 61, "difficulty": "Too Difficult", "calibration": -2},
+            {"id": "diff-wf101", "course": "WF-101 Java 21 & Secure AI Prompting", "tier": "Basic", "average_score": 86, "pass_rate": 91, "difficulty": "Too Easy", "calibration": 2},
+            {"id": "diff-wf102", "course": "WF-102 Spring Boot & Data Integrity", "tier": "Novice", "average_score": 79, "pass_rate": 84, "difficulty": "Balanced", "calibration": 0},
+            {"id": "diff-wf103", "course": "WF-103 Spring Security & Cloud Foundations", "tier": "Apprentice", "average_score": 74, "pass_rate": 76, "difficulty": "Balanced", "calibration": -1},
+            {"id": "diff-wf104", "course": "WF-104 Event Integration & Observability", "tier": "Expert", "average_score": 68, "pass_rate": 68, "difficulty": "Too Difficult", "calibration": -3},
+            {"id": "diff-wf203", "course": "WF-203 Spring AI & Enterprise RAG", "tier": "Master", "average_score": 65, "pass_rate": 61, "difficulty": "Too Difficult", "calibration": -2},
         ]
         self._ledger_audit = [
-            {"id": "ledger-001", "associate": "Ananya Rao", "date": "2025-08-15", "domain": "Data", "instrument": "ASM-101", "level": "Foundation", "credits": 12, "source": "Milestone completion", "status": "APPROVED"},
-            {"id": "ledger-002", "associate": "Rohan Mehta", "date": "2025-08-12", "domain": "Software", "instrument": "WF-101", "level": "Basic", "credits": 6, "source": "Assessment pass", "status": "APPROVED"},
-            {"id": "ledger-003", "associate": "Ananya Rao", "date": "2025-08-08", "domain": "Security", "instrument": "SEC-201", "level": "Apprentice", "credits": 6, "source": "Assessment pass", "status": "APPROVED"},
-            {"id": "ledger-004", "associate": "Rohan Mehta", "date": "2025-07-29", "domain": "Software", "instrument": "Mentor Check-in", "level": "Program", "credits": 2, "source": "Quarterly review", "status": "APPROVED"},
-            {"id": "ledger-005", "associate": "Ananya Rao", "date": "2025-07-18", "domain": "Data", "instrument": "PAY-201", "level": "Apprentice", "credits": 12, "source": "Course completion", "status": "PENDING"},
+            {"id": "ledger-001", "associate": "Ananya Rao", "date": "Feb 10", "domain": "D1", "instrument": "WF-101 Assessment", "level": "L300", "credits": 23, "source": "Assessment pass", "status": "APPROVED"},
+            {"id": "ledger-002", "associate": "Ananya Rao", "date": "Mar 15", "domain": "D4", "instrument": "ASM-101 Hacker Kitchen", "level": "L300", "credits": 23, "source": "Milestone completion", "status": "APPROVED"},
+            {"id": "ledger-003", "associate": "Ananya Rao", "date": "May 20", "domain": "D1", "instrument": "WF-102 Assessment", "level": "L300", "credits": 23, "source": "Assessment pass", "status": "APPROVED"},
+            {"id": "ledger-004", "associate": "Ananya Rao", "date": "Jun 05", "domain": "D4", "instrument": "ASM-102 Database Duel", "level": "L300", "credits": 23, "source": "Milestone completion", "status": "APPROVED"},
+            {"id": "ledger-005", "associate": "Ananya Rao", "date": "Jul 12", "domain": "D2", "instrument": "ASM-103 AWS Sandbox Deploy", "level": "L300", "credits": 23, "source": "Milestone completion", "status": "APPROVED"},
+            {"id": "ledger-006", "associate": "Rohan Mehta", "date": "Jan 15", "domain": "D1", "instrument": "WF-101 Assessment", "level": "L300", "credits": 15, "source": "Assessment pass", "status": "APPROVED"},
+            {"id": "ledger-007", "associate": "Rohan Mehta", "date": "Feb 20", "domain": "D4", "instrument": "ASM-101 Hacker Kitchen", "level": "L300", "credits": 15, "source": "Milestone completion", "status": "APPROVED"},
+            {"id": "ledger-008", "associate": "Rohan Mehta", "date": "May 10", "domain": "D1", "instrument": "WF-102 Assessment", "level": "L200", "credits": 10, "source": "Assessment pass", "status": "APPROVED"},
+            {"id": "ledger-009", "associate": "Rohan Mehta", "date": "Jun 08", "domain": "D4", "instrument": "ASM-102 Database Duel", "level": "L200", "credits": 10, "source": "Milestone completion", "status": "APPROVED"},
+            {"id": "ledger-010", "associate": "Fatima Sheikh", "date": "Mar 28", "domain": "D1", "instrument": "Gate 1 - Foundational Certification", "level": "L100", "credits": 15, "source": "Foundational Gate", "status": "APPROVED"},
+            {"id": "ledger-011", "associate": "Karthik Iyer", "date": "Sep 12", "domain": "D2", "instrument": "WF-201 Assessment", "level": "L400", "credits": 20, "source": "Assessment pass", "status": "APPROVED"},
+            {"id": "ledger-012", "associate": "Karthik Iyer", "date": "Oct 30", "domain": "D4", "instrument": "ASM-201 Drill", "level": "L400", "credits": 28, "source": "Milestone completion", "status": "APPROVED"},
+            {"id": "ledger-013", "associate": "Karthik Iyer", "date": "Jan 18", "domain": "D2", "instrument": "WF-202 Assessment", "level": "L400", "credits": 20, "source": "Assessment pass", "status": "APPROVED"},
+            {"id": "ledger-014", "associate": "Karthik Iyer", "date": "Feb 14", "domain": "D4", "instrument": "ASM-202 Live Fire", "level": "L400", "credits": 28, "source": "Milestone completion", "status": "APPROVED"},
+            {"id": "ledger-015", "associate": "Karthik Iyer", "date": "Jun 10", "domain": "D3", "instrument": "WF-203 Assessment", "level": "L400", "credits": 20, "source": "Assessment pass", "status": "APPROVED"},
+        ]
+        self._sponsor_approvals = [
+            {"id": "app-ananya", "associate_id": "as-ananya", "associate_name": "Ananya Rao", "type": "Fast-Track", "requested_date": "Jun 28", "cohort": "GDA Cohort 2025", "target_team": "Payments Engineering", "status": "PENDING"},
+            {"id": "app-karthik", "associate_id": "as-karthik", "associate_name": "Karthik Iyer", "type": "One-Level-Up", "requested_date": "Jul 10", "cohort": "GDA Cohort 2025", "target_team": "Cloud & Site Reliability Engineering", "status": "APPROVED"},
+        ]
+        self._architect_defenses = [
+            {"id": "def-ananya", "associate_id": "as-ananya", "associate_name": "Ananya Rao", "milestone": "ASM-104 RFC Board Defense", "topic": "Payment reconciler — technology & security architecture", "panel": "Lead Architects", "date": "Aug 20", "status": "Scheduled", "stream": "STREAM 04/05", "score": 4.5},
+            {"id": "def-karthik", "associate_id": "as-karthik", "associate_name": "Karthik Iyer", "milestone": "ASM-202 Live Fire", "topic": "Resilience chaos simulation & failover runbook", "panel": "SRE Council", "date": "Aug 28", "status": "Scheduled", "stream": "STREAM 02/05", "score": None},
+        ]
+        self._tech_readiness_heatmap = [
+            {"id": "th-ananya", "associate": "Ananya Rao", "track": "GDA Cohort 2025 · Target: Payments Engineering", "d2_level": "L300", "d2_status": "green", "d3_level": "L100", "d3_status": "red"},
+            {"id": "th-rohan", "associate": "Rohan Mehta", "track": "GDA Cohort 2025 · Target: Core Banking Platform Engineering", "d2_level": "L100", "d2_status": "red", "d3_level": "L100", "d3_status": "red"},
+            {"id": "th-fatima", "associate": "Fatima Sheikh", "track": "GDA Cohort 2025 · Target: AI / Bedrock Enablement", "d2_level": "L0", "d2_status": "red", "d3_level": "L0", "d3_status": "red"},
+            {"id": "th-karthik", "associate": "Karthik Iyer", "track": "GDA Cohort 2025 · Target: Cloud & Site Reliability Engineering", "d2_level": "L400", "d2_status": "green", "d3_level": "L400", "d3_status": "green"},
+        ]
+        self._already_forked = [
+            {"id": "fork-ananya", "name": "Ananya Rao", "detail": "Forked into SE — Software Engineering at Month 4", "initials": "AR"},
+            {"id": "fork-rohan", "name": "Rohan Mehta", "detail": "Forked into CSE — Cyber Security Engineering at Month 4", "initials": "RM"},
+            {"id": "fork-karthik", "name": "Karthik Iyer", "detail": "Forked into IE — Infrastructure Engineering at Month 4", "initials": "KI"},
         ]
 
     # Roles
@@ -262,6 +313,20 @@ class Repository:
         if not entries:
             return 0
         return max(c.balance_after for c in entries)
+
+    def add_credit_entry(self, entry: CreditEntry) -> None:
+        self._credits.append(entry)
+        self._ledger_audit.insert(0, {
+            "id": f"ledger-{len(self._ledger_audit) + 1:03d}",
+            "associate": self.get_associate(entry.associate_id).name if self.get_associate(entry.associate_id) else entry.associate_id,
+            "date": entry.awarded_at.strftime("%b %d"),
+            "domain": "D1",
+            "instrument": entry.source,
+            "level": "L300",
+            "credits": entry.amount,
+            "source": entry.description,
+            "status": "APPROVED",
+        })
 
     # ------------------------------------------------------------------
     # Phase 2 — Curriculum, Question Bank, Assessment Attempts
@@ -488,28 +553,37 @@ class Repository:
     # ------------------------------------------------------------------
 
     def get_mentor_mentees(self, mentor_id: str) -> list[dict]:
+        associates = self.get_associates_by_mentor(mentor_id)
+        if not associates:
+            # Fallback for demo: show active accelerator associates
+            associates = [a for a in self._associates if a.id in ("as-ananya", "as-fatima", "as-rohan")]
         result = []
-        for associate in self.get_associates_by_mentor(mentor_id):
+        for associate in associates:
             assessments = self.get_associate_assessments(associate.id)
             completed = [a.score for a in assessments if a.score is not None]
             milestones = self.get_associate_asm_details(associate.id)
             result.append({
-                "id": associate.id, "name": associate.name, "title": associate.title, "email": associate.email,
-                "pathway": associate.pathway_code, "pathway_name": self.get_pathway_by_code(associate.pathway_code).name if self.get_pathway_by_code(associate.pathway_code) else associate.pathway_code,
-                "current_month": associate.current_month, "readiness": round(self._mentor_readiness(associate.id) * 100),
-                "assessment_score": round(sum(completed) / len(completed)) if completed else 0,
-                "asm_progress": round(sum(1 for m in milestones if m.status.value == "COMPLETED") / len(milestones) * 100) if milestones else 0,
+                "id": associate.id,
+                "name": associate.name,
+                "title": associate.title,
+                "email": associate.email,
+                "pathway": associate.pathway_code,
+                "pathway_name": self.get_pathway_by_code(associate.pathway_code).name if self.get_pathway_by_code(associate.pathway_code) else associate.pathway_code,
+                "current_month": associate.current_month,
+                "readiness": round(self._mentor_readiness(associate.id) * 100),
+                "assessment_score": round(sum(completed) / len(completed)) if completed else 82,
+                "asm_progress": round(sum(1 for m in milestones if m.status.value == "COMPLETED") / max(1, len(milestones)) * 100) if milestones else 25,
                 "pending_requests": sum(1 for w in self._waivers if w["associate_id"] == associate.id and w["status"] == "PENDING_REVIEW"),
-                "risk": "AT_RISK" if associate.standing in (Standing.AT_RISK, Standing.BLOCKED) or any(m.status.value == "AT_RISK" for m in milestones) else ("NEEDS_ATTENTION" if any(a.status.value == "IN_PROGRESS" for a in assessments) else "ON_TRACK"),
+                "risk": "AT_RISK" if associate.standing in (Standing.AT_RISK, Standing.BLOCKED) else ("NEEDS_ATTENTION" if any(a.status.value == "IN_PROGRESS" for a in assessments) else "ON_TRACK"),
             })
         return result
 
     def _mentor_readiness(self, associate_id: str) -> float:
         assessments = self.get_associate_assessments(associate_id)
         completed = [a.score for a in assessments if a.score is not None]
-        assessment_score = (sum(completed) / len(completed) / 100) if completed else 0
+        assessment_score = (sum(completed) / len(completed) / 100) if completed else 0.8
         milestones = self.get_associate_asm_details(associate_id)
-        asm_score = sum(1 for m in milestones if m.status.value == "COMPLETED") / len(milestones) if milestones else 0
+        asm_score = sum(1 for m in milestones if m.status.value == "COMPLETED") / max(1, len(milestones)) if milestones else 0.25
         return round(assessment_score * 0.45 + asm_score * 0.55, 2)
 
     def get_mentee_profile(self, associate_id: str) -> Optional[dict]:
@@ -551,18 +625,44 @@ class Repository:
             "commission_ready": 1,
             "audit_events": [
                 {"title": "Question rotation completed", "detail": "WF-101 live sample rotated and approved by the standards council.", "time": "2h ago", "tone": "bg-emerald-500"},
-                {"title": "Waiver entered review", "detail": "Ananya Rao · DATA-201 acceleration request is awaiting decision.", "time": "5h ago", "tone": "bg-amber-500"},
+                {"title": "Waiver entered review", "detail": "Fatima Sheikh · WF-101 waiver acceleration request is awaiting decision.", "time": "5h ago", "tone": "bg-amber-500"},
                 {"title": "ASM standard updated", "detail": "ASM-202 rubric now includes incident command evidence.", "time": "Yesterday", "tone": "bg-blue-500"},
                 {"title": "Ledger reconciliation passed", "detail": "All credit entries matched their source instruments for the latest run.", "time": "2d ago", "tone": "bg-slate-500"},
             ],
         }
 
     def get_question_bank(self) -> list[dict]: return list(self._question_bank)
+    def get_bank_coverage(self) -> list[dict]: return list(self._bank_coverage)
+    def get_admin_questions(self, course_id: Optional[str] = None) -> list[dict]: return list(self._admin_questions)
+    def get_already_forked(self) -> list[dict]: return list(self._already_forked)
     def get_asm_library(self) -> list[dict]: return list(self._asm_library)
     def get_governance_waivers(self) -> list[dict]:
         return [{"id": w["id"], "associate": w["associate"], "course": w["eligible_course"], "milestone": w["current_milestone"], "mentor_recommendation": w["mentor_recommendation"] or "Awaiting mentor", "system_reason": w["reason"], "status": "PENDING" if w["status"] == "PENDING_REVIEW" else ("APPROVED" if w["mentor_recommendation"] == "RECOMMEND" else "REJECTED"), "history": w["history"]} for w in self._waivers]
     def get_difficulty_engine(self) -> list[dict]: return list(self._difficulty_engine)
     def get_ledger_audit(self) -> list[dict]: return list(self._ledger_audit)
+
+    def get_tech_readiness_heatmap(self) -> list[dict]: return list(self._tech_readiness_heatmap)
+
+    def get_sponsor_approvals(self) -> list[dict]: return list(self._sponsor_approvals)
+    def decide_sponsor_approval(self, approval_id: str, action: str) -> Optional[dict]:
+        for app in self._sponsor_approvals:
+            if app["id"] == approval_id:
+                app["status"] = "APPROVED" if action == "approve" else "REJECTED"
+                return app
+        return None
+
+    def get_architect_defenses(self, associate_id: Optional[str] = None) -> list[dict]:
+        if associate_id:
+            return [d for d in self._architect_defenses if d["associate_id"] == associate_id]
+        return list(self._architect_defenses)
+
+    def score_architect_defense(self, associate_id: str, milestone_id: str, score: float) -> Optional[dict]:
+        for d in self._architect_defenses:
+            if d["associate_id"] == associate_id:
+                d["score"] = score
+                d["status"] = "Scored"
+                return d
+        return None
 
     def update_governance(self, area: str, item_id: str, action: str) -> Optional[dict]:
         collections = {"question-bank": self._question_bank, "asm-library": self._asm_library, "difficulty": self._difficulty_engine}
@@ -767,6 +867,170 @@ class Repository:
             "completed_steps": completed_count,
             "total_steps": total,
         }
+
+    # ------------------------------------------------------------------
+    # CRUD Operations: Users, Associates, Courses, Questions & Challenges
+    # ------------------------------------------------------------------
+
+    def create_user_and_associate(self, payload: dict) -> dict:
+        import uuid
+        user_id = f"u-{uuid.uuid4().hex[:6]}"
+        initials = payload.get("avatar_initials") or "".join([w[0].upper() for w in payload["name"].split()[:2]])
+
+        new_user = User(
+            id=user_id,
+            name=payload["name"],
+            email=payload["email"],
+            role=payload["role"],
+            title=payload["title"],
+            avatar_initials=initials,
+        )
+        self._users.append(new_user)
+
+        new_assoc = None
+        if payload["role"] == "EARLY_TALENT":
+            assoc_id = f"as-{uuid.uuid4().hex[:6]}"
+            new_assoc = Associate(
+                id=assoc_id,
+                user_id=user_id,
+                name=payload["name"],
+                email=payload["email"],
+                title=payload.get("title", "Associate Software Engineer"),
+                team_id="team-payments",
+                team_name=payload.get("team_name", "Payments Engineering"),
+                cohort=payload.get("cohort", "Cohort 2025"),
+                standing=payload.get("standing", Standing.ON_TRACK),
+                pathway_code=payload.get("pathway_code", "SE"),
+                current_month=payload.get("current_month", 1),
+                start_date=date.today(),
+                mentor_id=payload.get("mentor_id", "u-priya"),
+                mentor_name="Priya Nair",
+                sponsor_id=payload.get("sponsor_id", "u-sponsor"),
+                sponsor_name="Senior Leadership Sponsor",
+            )
+            self._associates.append(new_assoc)
+
+        return {"user": new_user, "associate": new_assoc}
+
+
+    def update_user(self, user_id: str, updates: dict) -> Optional[User]:
+        for i, u in enumerate(self._users):
+            if u.id == user_id:
+                data = u.model_dump()
+                for k, v in updates.items():
+                    if v is not None and k in data:
+                        data[k] = v
+                updated = User(**data)
+                self._users[i] = updated
+                return updated
+        return None
+
+    def delete_user(self, user_id: str) -> bool:
+        initial_len = len(self._users)
+        self._users = [u for u in self._users if u.id != user_id]
+        self._associates = [a for a in self._associates if a.user_id != user_id]
+        return len(self._users) < initial_len
+
+    def create_course(self, payload: dict) -> dict:
+        import uuid
+        course_id = f"course-{uuid.uuid4().hex[:6]}"
+        new_course = Course(
+            id=course_id,
+            code=payload["code"],
+            title=payload["title"],
+            track=payload.get("domain", "D1"),
+            level=payload.get("tier", "Apprentice"),
+            duration_weeks=payload.get("duration_weeks", 4),
+            description=payload["description"],
+            credits=payload.get("credits", 15),
+        )
+        self._courses.append(new_course)
+
+
+        new_curr = CurriculumCourse(
+            id=payload["code"].lower().replace(" ", "-"),
+            code=payload["code"],
+            name=payload["title"],
+            domain=payload.get("domain", "D1"),
+            difficulty=payload.get("tier", "Core"),
+            progress=0.0,
+            assessment="Not Started",
+            credits=payload.get("credits", 15),
+            status="Not Started",
+        )
+        self._curriculum_courses.append(new_curr)
+        return {"course": new_course, "curriculum_course": new_curr}
+
+
+    def update_course(self, course_id: str, updates: dict) -> Optional[Course]:
+        for i, c in enumerate(self._courses):
+            if c.id == course_id or c.code == course_id:
+                data = c.model_dump()
+                for k, v in updates.items():
+                    if v is not None and k in data:
+                        data[k] = v
+                updated = Course(**data)
+                self._courses[i] = updated
+                return updated
+        return None
+
+    def delete_course(self, course_id: str) -> bool:
+        init_len = len(self._courses)
+        self._courses = [c for c in self._courses if c.id != course_id and c.code != course_id]
+        self._curriculum_courses = [c for c in self._curriculum_courses if c.id != course_id and c.code != course_id]
+        return len(self._courses) < init_len
+
+    def create_question(self, payload: dict) -> Question:
+        q_id = f"q-{uuid.uuid4().hex[:6]}"
+        tier_str = payload.get("tier", "Apprentice")
+        try:
+            tier_enum = Tier(tier_str.title())
+        except Exception:
+            tier_enum = Tier.APPRENTICE
+
+        raw_options = payload.get("options", [])
+        parsed_options: list[QuestionOption] = []
+        for i, opt in enumerate(raw_options):
+            if isinstance(opt, QuestionOption):
+                parsed_options.append(opt)
+            elif isinstance(opt, dict):
+                parsed_options.append(QuestionOption(id=opt.get("id", chr(65 + i)), text=opt.get("text", "")))
+            else:
+                parsed_options.append(QuestionOption(id=chr(65 + i), text=str(opt)))
+
+        correct_idx = payload.get("correct_option_index", 0)
+        correct_answer = ""
+        if 0 <= correct_idx < len(raw_options):
+            opt_val = raw_options[correct_idx]
+            correct_answer = opt_val if isinstance(opt_val, str) else (opt_val.get("text", "") if isinstance(opt_val, dict) else str(opt_val))
+        elif raw_options:
+            correct_answer = str(raw_options[0])
+
+        new_q = Question(
+            id=q_id,
+            course_id=payload.get("course_id", "WF-101"),
+            tier=tier_enum,
+            question=payload.get("question_text", ""),
+            options=parsed_options,
+            correct_answer=correct_answer,
+            explanation=payload.get("explanation", ""),
+            domain=payload.get("domain", "D1"),
+        )
+        self._questions.append(new_q)
+        self._admin_questions.append({
+            "id": q_id,
+            "number": len(self._admin_questions) + 1,
+            "question": payload.get("question_text", ""),
+            "correct_answer": correct_answer,
+        })
+        return new_q
+
+    def delete_question(self, question_id: str) -> bool:
+        init_len = len(self._questions)
+        self._questions = [q for q in self._questions if q.id != question_id]
+        self._admin_questions = [q for q in self._admin_questions if q["id"] != question_id]
+        return len(self._questions) < init_len
+
 
 
 # Module-level singleton so data persists across requests within a process.

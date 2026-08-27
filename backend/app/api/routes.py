@@ -145,6 +145,21 @@ def get_question_bank():
     return get_repository().get_question_bank()
 
 
+@router.get("/committee/bank-coverage")
+def get_bank_coverage():
+    return get_repository().get_bank_coverage()
+
+
+@router.get("/committee/admin-questions")
+def get_admin_questions(course_id: Optional[str] = None):
+    return get_repository().get_admin_questions(course_id)
+
+
+@router.get("/pathways/already-forked")
+def get_already_forked():
+    return get_repository().get_already_forked()
+
+
 @router.get("/committee/asm-library")
 def get_asm_library():
     return get_repository().get_asm_library()
@@ -536,3 +551,666 @@ def get_workforce_recommendations():
 @router.get("/sponsored-asm")
 def get_sponsored_asm():
     return _demand_service().get_sponsored_asm()
+
+
+# ---------------------------------------------------------------------------
+# Technology Head + Approvals + Architect Board
+# ---------------------------------------------------------------------------
+
+@router.get("/techhead/readiness-heatmap")
+def get_tech_readiness_heatmap():
+    return get_repository().get_tech_readiness_heatmap()
+
+
+@router.get("/sponsor/approvals")
+def get_sponsor_approvals():
+    return get_repository().get_sponsor_approvals()
+
+
+@router.post("/sponsor/approvals/{approval_id}/{action}")
+def decide_sponsor_approval(approval_id: str, action: str):
+    result = get_repository().decide_sponsor_approval(approval_id, action)
+    if not result:
+        raise HTTPException(status_code=404, detail="Approval request not found")
+    return result
+
+
+@router.get("/architect-board/defenses")
+def get_architect_defenses():
+    return get_repository().get_architect_defenses()
+
+
+@router.get("/architect-board/defenses/{associate_id}")
+def get_associate_architect_defenses(associate_id: str):
+    return get_repository().get_architect_defenses(associate_id)
+
+
+class DefenseScorePayload(BaseModel):
+    associate_id: str
+    milestone_id: str = "asm-104"
+    score: float
+
+
+@router.post("/architect-board/score")
+def score_architect_defense(payload: DefenseScorePayload):
+    result = get_repository().score_architect_defense(payload.associate_id, payload.milestone_id, payload.score)
+    if not result:
+        raise HTTPException(status_code=404, detail="Defense record not found")
+    return result
+
+
+# ---------------------------------------------------------------------------
+# HackerRank-Grade Code Execution & Coding Challenges
+# ---------------------------------------------------------------------------
+
+def _code_service():
+    from app.services.code_executor import CodeExecutorService
+    return CodeExecutorService(get_repository())
+
+
+@router.get("/coding/challenges")
+def get_coding_challenges():
+    return _code_service().get_challenges()
+
+
+@router.get("/coding/challenges/{challenge_id}")
+def get_coding_challenge(challenge_id: str):
+    c = _code_service().get_challenge(challenge_id)
+    if not c:
+        raise HTTPException(status_code=404, detail="Challenge not found")
+    return c
+
+
+@router.post("/code/run")
+def run_code(payload: CodeExecutionRequest):
+    return _code_service().execute_code(payload)
+
+
+@router.post("/code/submit")
+def submit_code(payload: CodeSubmissionRequest):
+    return _code_service().submit_code(payload)
+
+
+# ---------------------------------------------------------------------------
+# Administration & Studio Endpoints (User, Course, Question & Challenge CRUD)
+# ---------------------------------------------------------------------------
+
+@router.post("/users")
+def create_user(payload: CreateUserPayload):
+    return get_repository().create_user_and_associate(payload.model_dump())
+
+
+@router.put("/users/{user_id}")
+def update_user(user_id: str, payload: UpdateUserPayload):
+    res = get_repository().update_user(user_id, payload.model_dump(exclude_unset=True))
+    if not res:
+        raise HTTPException(status_code=404, detail="User not found")
+    return res
+
+
+@router.delete("/users/{user_id}")
+def delete_user(user_id: str):
+    success = get_repository().delete_user(user_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="User not found")
+    return {"status": "DELETED", "user_id": user_id}
+
+
+@router.post("/courses")
+def create_course(payload: CreateCoursePayload):
+    return get_repository().create_course(payload.model_dump())
+
+
+@router.put("/courses/{course_id}")
+def update_course(course_id: str, payload: UpdateCoursePayload):
+    res = get_repository().update_course(course_id, payload.model_dump(exclude_unset=True))
+    if not res:
+        raise HTTPException(status_code=404, detail="Course not found")
+    return res
+
+
+@router.delete("/courses/{course_id}")
+def delete_course(course_id: str):
+    success = get_repository().delete_course(course_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Course not found")
+    return {"status": "DELETED", "course_id": course_id}
+
+
+@router.post("/questions")
+def create_question(payload: CreateQuestionPayload):
+    return get_repository().create_question(payload.model_dump())
+
+
+@router.delete("/questions/{question_id}")
+def delete_question(question_id: str):
+    success = get_repository().delete_question(question_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Question not found")
+    return {"status": "DELETED", "question_id": question_id}
+
+
+@router.post("/coding/challenges")
+def create_coding_challenge(payload: CreateCodingChallengePayload):
+    return _code_service().create_challenge(payload.model_dump())
+
+
+@router.delete("/coding/challenges/{challenge_id}")
+def delete_coding_challenge(challenge_id: str):
+    success = _code_service().delete_challenge(challenge_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Challenge not found")
+    return {"status": "DELETED", "challenge_id": challenge_id}
+
+
+# ---------------------------------------------------------------------------
+# Skills Intelligence Endpoints (Phase 1)
+# ---------------------------------------------------------------------------
+
+from app.services.skill_service import get_skill_service
+
+
+@router.get("/skills/taxonomy")
+def get_skills_taxonomy():
+    return get_skill_service().get_taxonomy()
+
+
+@router.get("/skills/associate/{associate_id}/profile")
+def get_associate_skill_profile(associate_id: str):
+    return get_skill_service().get_profile(associate_id)
+
+
+@router.get("/skills/associate/{associate_id}/gaps")
+def get_associate_skill_gaps(associate_id: str):
+    return get_skill_service().get_gaps(associate_id)
+
+
+@router.get("/skills/associate/{associate_id}/recommendations")
+def get_associate_skill_recommendations(associate_id: str):
+    return get_skill_service().get_recommendations(associate_id)
+
+
+@router.get("/skills/associate/{associate_id}/evidence/{skill_id}")
+def get_associate_skill_evidence(associate_id: str, skill_id: str):
+    evidence = get_skill_service().get_skill_evidence(associate_id, skill_id)
+    if not evidence:
+        raise HTTPException(status_code=404, detail="Skill evidence not found for this associate")
+    return evidence
+
+
+# ---------------------------------------------------------------------------
+# AI Talent Intelligence Endpoints (Phase 2)
+# ---------------------------------------------------------------------------
+
+from app.services.ai_intelligence_service import get_ai_intelligence_service
+from app.models.schemas import AICoachChatRequest, AIExecutiveQueryRequest
+
+
+@router.get("/ai/readiness/{associate_id}")
+def get_ai_readiness(associate_id: str):
+    return get_ai_intelligence_service().get_readiness_breakdown(associate_id)
+
+
+@router.get("/ai/predictions/{associate_id}")
+def get_ai_predictions(associate_id: str):
+    return get_ai_intelligence_service().get_readiness_prediction(associate_id)
+
+
+@router.get("/ai/coach/history/{associate_id}")
+def get_ai_coach_history(associate_id: str):
+    return get_ai_intelligence_service().get_coach_history(associate_id)
+
+
+@router.post("/ai/coach/chat")
+def chat_with_ai_coach(req: AICoachChatRequest):
+    return get_ai_intelligence_service().chat_with_coach(req)
+
+
+@router.get("/ai/mentor/brief/{associate_id}")
+def get_ai_mentor_brief(associate_id: str):
+    return get_ai_intelligence_service().get_mentor_brief(associate_id)
+
+
+@router.get("/ai/mentor/briefs")
+def get_all_ai_mentor_briefs():
+    return get_ai_intelligence_service().get_all_mentor_briefs()
+
+
+@router.post("/ai/executive/query")
+def execute_ai_executive_query(req: AIExecutiveQueryRequest):
+    return get_ai_intelligence_service().execute_executive_query(req)
+
+
+# ---------------------------------------------------------------------------
+# Configurable Workflow Engine & SLA Escalation Endpoints (Phase 3)
+# ---------------------------------------------------------------------------
+
+from app.services.workflow_service import get_workflow_service
+from app.services.notification_service import get_notification_service
+from app.models.schemas import WorkflowDefinition, WorkflowTransitionRequest
+
+
+@router.get("/workflows/definitions")
+def get_workflow_definitions():
+    return get_workflow_service().get_definitions()
+
+
+@router.get("/workflows/definitions/{code}")
+def get_workflow_definition(code: str):
+    wf = get_workflow_service().get_definition(code)
+    if not wf:
+        raise HTTPException(status_code=404, detail="Workflow definition not found")
+    return wf
+
+
+@router.post("/workflows/definitions")
+def save_workflow_definition(payload: WorkflowDefinition):
+    return get_workflow_service().save_definition(payload)
+
+
+@router.get("/workflows/instances")
+def get_workflow_instances(role: Optional[str] = None, associate_id: Optional[str] = None, status: Optional[str] = None):
+    return get_workflow_service().get_instances(role=role, associate_id=associate_id, status=status)
+
+
+@router.get("/workflows/instances/{instance_id}")
+def get_workflow_instance(instance_id: str):
+    inst = get_workflow_service().get_instance(instance_id)
+    if not inst:
+        raise HTTPException(status_code=404, detail="Workflow instance not found")
+    return inst
+
+
+@router.post("/workflows/instances/transition")
+def transition_workflow_instance(req: WorkflowTransitionRequest):
+    try:
+        return get_workflow_service().transition_instance(req)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.get("/workflows/sla/dashboard")
+def get_sla_dashboard():
+    return get_workflow_service().get_sla_dashboard()
+
+
+# ---------------------------------------------------------------------------
+# Enterprise Notification Center Endpoints (Phase 3)
+# ---------------------------------------------------------------------------
+
+@router.get("/notifications")
+def get_notifications(user_id: Optional[str] = None, unread_only: bool = False):
+    return get_notification_service().get_notifications(user_id=user_id, unread_only=unread_only)
+
+
+@router.patch("/notifications/{notification_id}/read")
+def mark_notification_read(notification_id: str):
+    success = get_notification_service().mark_as_read(notification_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Notification not found")
+    return {"status": "READ", "notification_id": notification_id}
+
+
+@router.post("/notifications/read-all")
+def mark_all_notifications_read(user_id: Optional[str] = None):
+    count = get_notification_service().mark_all_as_read(user_id=user_id)
+    return {"status": "ALL_READ", "count": count}
+
+
+@router.get("/notifications/templates")
+def get_notification_templates():
+    return get_notification_service().get_templates()
+
+
+# ---------------------------------------------------------------------------
+# Adaptive Testing & Question Governance Endpoints (Phase 4)
+# ---------------------------------------------------------------------------
+
+from app.services.assessment_engine_service import get_assessment_engine_service
+from app.models.schemas import AdaptiveStartRequest, AdaptiveAnswerSubmit, GovernanceQuestion
+
+
+@router.post("/assessments/adaptive/start")
+def start_adaptive_assessment(req: AdaptiveStartRequest):
+    return get_assessment_engine_service().start_adaptive_session(req)
+
+
+@router.post("/assessments/adaptive/submit")
+def submit_adaptive_answer(req: AdaptiveAnswerSubmit):
+    try:
+        return get_assessment_engine_service().submit_adaptive_answer(req)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.get("/assessments/governance/questions")
+def get_governance_questions(domain: Optional[str] = None, status: Optional[str] = None):
+    return get_assessment_engine_service().get_governance_questions(domain=domain, status=status)
+
+
+@router.post("/assessments/governance/questions")
+def save_governance_question(question: GovernanceQuestion):
+    return get_assessment_engine_service().save_governance_question(question)
+
+
+@router.patch("/assessments/governance/questions/{question_id}/status")
+def update_question_status(question_id: str, status: str):
+    try:
+        return get_assessment_engine_service().update_question_status(question_id, status)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+
+@router.get("/assessments/proctoring/{session_id}")
+def get_proctoring_telemetry(session_id: str):
+    telemetry = get_assessment_engine_service().get_proctoring_telemetry(session_id)
+    if not telemetry:
+        raise HTTPException(status_code=404, detail="Proctoring telemetry not found for session")
+    return telemetry
+
+
+# ---------------------------------------------------------------------------
+# ASM Lifecycle & Verifiable Digital Credentials Endpoints (Phase 5)
+# ---------------------------------------------------------------------------
+
+from app.services.asm_lifecycle_service import get_asm_lifecycle_service
+from app.services.credential_service import get_credential_service
+from app.models.schemas import ASMPanelMember, IssueCredentialRequest
+
+
+@router.get("/asm/lifecycle/projects")
+def get_asm_projects(associate_id: Optional[str] = None, stage: Optional[str] = None):
+    return get_asm_lifecycle_service().get_projects(associate_id=associate_id, stage=stage)
+
+
+@router.get("/asm/lifecycle/projects/{project_id}")
+def get_asm_project(project_id: str):
+    proj = get_asm_lifecycle_service().get_project(project_id)
+    if not proj:
+        raise HTTPException(status_code=404, detail="ASM Project not found")
+    return proj
+
+
+@router.post("/asm/lifecycle/projects/{project_id}/panel-score")
+def submit_asm_panel_score(project_id: str, member: ASMPanelMember):
+    try:
+        return get_asm_lifecycle_service().submit_panel_score(project_id, member)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.get("/credentials/associate/{associate_id}")
+def get_associate_credentials(associate_id: str):
+    return get_credential_service().get_credentials(associate_id=associate_id)
+
+
+@router.get("/credentials/verify/{credential_id}")
+def verify_credential(credential_id: str):
+    cred = get_credential_service().get_credential(credential_id)
+    if not cred:
+        raise HTTPException(status_code=404, detail="Credential not found or invalid")
+    return cred
+
+
+@router.post("/credentials/issue")
+def issue_digital_credential(req: IssueCredentialRequest):
+    return get_credential_service().issue_credential(req)
+
+
+# ---------------------------------------------------------------------------
+# Internal Talent Marketplace & Strategic Workforce Planning (Phase 6)
+# ---------------------------------------------------------------------------
+
+from app.services.talent_marketplace_service import get_talent_marketplace_service
+from app.services.workforce_planning_service import get_workforce_planning_service
+from app.models.schemas import (
+    MarketplaceProject,
+    MarketplaceApplyRequest,
+    WorkforceScenarioRequest,
+)
+
+
+@router.get("/marketplace/projects")
+def get_marketplace_projects():
+    return get_talent_marketplace_service().get_projects()
+
+
+@router.get("/marketplace/projects/{project_id}")
+def get_marketplace_project(project_id: str):
+    proj = get_talent_marketplace_service().get_project(project_id)
+    if not proj:
+        raise HTTPException(status_code=404, detail="Project not found")
+    return proj
+
+
+@router.get("/marketplace/projects/{project_id}/matches/{associate_id}")
+def get_marketplace_project_match(project_id: str, associate_id: str):
+    return get_talent_marketplace_service().calculate_match_score(project_id, associate_id)
+
+
+@router.get("/marketplace/applications")
+def get_marketplace_applications(associate_id: Optional[str] = None, project_id: Optional[str] = None):
+    return get_talent_marketplace_service().get_applications(associate_id=associate_id, project_id=project_id)
+
+
+@router.post("/marketplace/apply")
+def apply_for_marketplace_project(req: MarketplaceApplyRequest):
+    try:
+        return get_talent_marketplace_service().apply_for_project(req)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.patch("/marketplace/applications/{application_id}/status")
+def update_application_status(application_id: str, status: str):
+    try:
+        return get_talent_marketplace_service().update_application_status(application_id, status)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.post("/workforce/simulate-scenario")
+def simulate_workforce_scenario(req: WorkforceScenarioRequest):
+    return get_workforce_planning_service().simulate_scenario(req)
+
+
+@router.get("/workforce/forecast")
+def get_workforce_baseline_forecast():
+    return get_workforce_planning_service().get_baseline_forecast()
+
+
+# ---------------------------------------------------------------------------
+# Executive Analytics, Custom Dashboard Builder & Reporting (Phase 7)
+# ---------------------------------------------------------------------------
+
+from app.services.analytics_service import get_analytics_service
+from app.services.report_export_service import get_report_export_service
+from app.models.schemas import (
+    CustomDashboardLayout,
+    ScheduledReport,
+    GenerateReportRequest,
+)
+
+
+@router.get("/analytics/executive")
+def get_executive_analytics():
+    return get_analytics_service().get_executive_analytics()
+
+
+@router.get("/analytics/cohorts")
+def get_cohort_analytics():
+    return get_analytics_service().get_cohort_analytics()
+
+
+@router.get("/analytics/skills-matrix")
+def get_skills_matrix_analytics():
+    return get_analytics_service().get_skill_health_matrix()
+
+
+@router.get("/analytics/dashboards")
+def get_custom_dashboards(role: Optional[str] = None):
+    return get_analytics_service().get_dashboards(role=role)
+
+
+@router.get("/analytics/dashboards/{dashboard_id}")
+def get_custom_dashboard(dashboard_id: str):
+    dash = get_analytics_service().get_dashboard(dashboard_id)
+    if not dash:
+        raise HTTPException(status_code=404, detail="Dashboard layout not found")
+    return dash
+
+
+@router.post("/analytics/dashboards")
+def save_custom_dashboard(dashboard: CustomDashboardLayout):
+    return get_analytics_service().save_dashboard(dashboard)
+
+
+@router.get("/reports/scheduled")
+def get_scheduled_reports():
+    return get_report_export_service().get_scheduled_reports()
+
+
+@router.post("/reports/scheduled")
+def save_scheduled_report(report: ScheduledReport):
+    return get_report_export_service().save_scheduled_report(report)
+
+
+@router.post("/reports/generate")
+def generate_report(req: GenerateReportRequest):
+    return get_report_export_service().generate_report(req)
+
+
+# ---------------------------------------------------------------------------
+# Data Governance, Metric Lineage & Audit Center (Phase 8)
+# ---------------------------------------------------------------------------
+
+from app.services.metric_lineage_service import get_metric_lineage_service
+from app.services.audit_service import get_audit_service
+from app.services.curriculum_version_service import get_curriculum_version_service
+from app.models.schemas import CurriculumBranchRequest
+
+
+@router.get("/governance/metrics/lineage")
+def get_metric_lineage_nodes():
+    return get_metric_lineage_service().get_lineage_nodes()
+
+
+@router.get("/governance/metrics/{metric_key}/debug")
+def debug_metric_calculation(metric_key: str):
+    return get_metric_lineage_service().debug_metric(metric_key)
+
+
+@router.get("/governance/audit/logs")
+def get_audit_logs(
+    severity: Optional[str] = None,
+    action: Optional[str] = None,
+    actor_id: Optional[str] = None,
+):
+    return get_audit_service().get_logs(severity=severity, action=action, actor_id=actor_id)
+
+
+@router.post("/governance/audit/verify-chain")
+def verify_audit_hash_chain():
+    return get_audit_service().verify_hash_chain()
+
+
+@router.get("/governance/curriculum/versions")
+def get_curriculum_versions(course_id: Optional[str] = None):
+    return get_curriculum_version_service().get_versions(course_id=course_id)
+
+
+@router.post("/governance/curriculum/branch")
+def create_curriculum_branch(req: CurriculumBranchRequest):
+    return get_curriculum_version_service().create_branch(req)
+
+
+# ---------------------------------------------------------------------------
+# Enterprise Integration Hub, Global Command Palette & Activity Stream (Phase 9)
+# ---------------------------------------------------------------------------
+
+from app.services.integration_hub_service import get_integration_hub_service
+from app.services.activity_presence_service import get_activity_presence_service
+from app.models.schemas import XAPIStatement
+
+
+@router.get("/integrations/lms")
+def get_lms_connectors():
+    return get_integration_hub_service().get_lms_connectors()
+
+
+@router.post("/integrations/lms/{connector_id}/sync")
+def trigger_lms_sync(connector_id: str):
+    try:
+        return get_integration_hub_service().trigger_lms_sync(connector_id)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+
+@router.get("/integrations/hris")
+def get_hris_connectors():
+    return get_integration_hub_service().get_hris_connectors()
+
+
+@router.post("/integrations/xapi/ingest")
+def ingest_xapi_statement(stmt: XAPIStatement):
+    return get_integration_hub_service().ingest_xapi_statement(stmt)
+
+
+@router.get("/activity/stream")
+def get_activity_stream(limit: int = 20):
+    return get_activity_presence_service().get_stream(limit=limit)
+
+
+@router.get("/activity/presence")
+def get_activity_presence():
+    return get_activity_presence_service().get_presence()
+
+
+@router.get("/search/global")
+def search_global(q: str = ""):
+    return get_activity_presence_service().search_global(query=q)
+
+
+# ---------------------------------------------------------------------------
+# Dynamic Scoring Rules & Control Center (Phase 10)
+# ---------------------------------------------------------------------------
+
+from app.services.control_center_service import get_control_center_service
+from app.models.schemas import ScoringRuleConfig, FeatureFlagUpdate
+
+
+@router.get("/control-center/health")
+def get_system_health():
+    return get_control_center_service().get_system_health()
+
+
+@router.get("/control-center/scoring-rules")
+def get_scoring_rules():
+    return get_control_center_service().get_scoring_rules()
+
+
+@router.post("/control-center/scoring-rules")
+def update_scoring_rule(rule: ScoringRuleConfig):
+    return get_control_center_service().update_scoring_rule(rule)
+
+
+@router.get("/control-center/feature-flags")
+def get_feature_flags():
+    return get_control_center_service().get_feature_flags()
+
+
+@router.post("/control-center/feature-flags")
+def update_feature_flags(req: FeatureFlagUpdate):
+    return get_control_center_service().update_feature_flags(req.flags)
+
+
+
+
+
+
+
+
+
+
+
+

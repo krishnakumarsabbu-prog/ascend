@@ -7,9 +7,10 @@ const configs: Record<Exclude<RoleId, 'EARLY_TALENT'>, { eyebrow: string; title:
   MENTOR_COACH: { eyebrow: 'Mentor workspace', title: 'My mentees', subtitle: 'Support your associates with focused coaching and timely interventions.', metric: '4', metricLabel: 'Active mentees', action: 'Review check-ins', icon: Users },
   ENGINEERING_EXCELLENCE_COMMITTEE: { eyebrow: 'Governance workspace', title: 'Cohort overview', subtitle: 'Monitor pathway health, assessment quality, and standards across cohorts.', metric: '86%', metricLabel: 'Cohort readiness', action: 'Open governance view', icon: ShieldCheck },
   SENIOR_LEADER_SPONSOR: { eyebrow: 'Sponsor workspace', title: 'Demand & pipeline', subtitle: 'Connect strategic engineering demand to a ready, developing talent pipeline.', metric: '18', metricLabel: 'Active placements', action: 'Review pipeline', icon: BarChart3 },
+  TECHNOLOGY_HEAD: { eyebrow: 'Technology leadership', title: 'Cloud & Platform Readiness', subtitle: 'Cross-cutting D2/D3 platform readiness across engineering cohorts.', metric: '4', metricLabel: 'Tracked associates', action: 'Open readiness heatmap', icon: ShieldCheck },
 }
 
-const accent: Record<string, string> = { MENTOR_COACH: 'blue', ENGINEERING_EXCELLENCE_COMMITTEE: 'emerald', SENIOR_LEADER_SPONSOR: 'amber' }
+const accent: Record<string, string> = { MENTOR_COACH: 'blue', ENGINEERING_EXCELLENCE_COMMITTEE: 'emerald', SENIOR_LEADER_SPONSOR: 'amber', TECHNOLOGY_HEAD: 'blue' }
 
 export function RoleWorkspace({ role, associates }: { role: Exclude<RoleId, 'EARLY_TALENT'>; associates: Associate[] }) {
   const config = configs[role]
