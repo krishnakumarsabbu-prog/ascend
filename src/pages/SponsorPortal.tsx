@@ -84,21 +84,23 @@ export function SponsorPortal() {
       </div>
 
       {/* Tabs */}
-      <div className="flex flex-wrap gap-2 border-b border-slate-200 pb-px">
+      <div className="flex flex-wrap gap-1 border-b border-slate-200 pb-px">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setView(tab.id)}
-            className={`flex items-center gap-2 border-b-2 px-3.5 py-2.5 text-xs font-bold transition-colors ${
+            className={`flex items-center gap-2 border-b-2 px-4 py-2.5 text-xs font-bold transition-all ${
               view === tab.id
-                ? 'border-blue-600 text-blue-700'
-                : 'border-transparent text-slate-500 hover:text-slate-800'
+                ? 'border-[#007df0] text-[#007df0]'
+                : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-800'
             }`}
           >
-            <tab.icon size={14} />
+            <tab.icon size={14} className={view === tab.id ? 'text-[#007df0]' : 'text-slate-400'} />
             {tab.label}
             {tab.badge && (
-              <span className="rounded bg-blue-100 px-1.5 py-0.2 text-[9px] font-bold text-blue-700">
+              <span className={`rounded px-1.5 py-0.2 text-[9px] font-bold ${
+                view === tab.id ? 'bg-sky-100 text-sky-800' : 'bg-slate-100 text-slate-600'
+              }`}>
                 {tab.badge}
               </span>
             )}

@@ -21,6 +21,7 @@ import {
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../../lib/api'
 import type { ASMProjectLifecycle, ASMPanelMember, ASMRubricScore } from '../../types'
+import { Card } from '../../components/ui'
 
 interface ASMLifecyclePageProps {
   associateId?: string
@@ -101,13 +102,13 @@ export function ASMLifecyclePage({ associateId = 'as-ananya' }: ASMLifecyclePage
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="px-2.5 py-0.5 text-xs font-black rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 uppercase tracking-wider flex items-center gap-1.5">
-              <GitBranch className="w-3.5 h-3.5" /> ASM Milestone Journey
+            <span className="px-2.5 py-0.5 text-xs font-bold rounded-md bg-sky-50 text-sky-700 border border-sky-200 uppercase tracking-wider flex items-center gap-1.5">
+              <GitBranch className="w-3.5 h-3.5 text-[#007df0]" /> ASM Milestone Journey
             </span>
-            <span className="text-xs text-slate-500">•</span>
-            <span className="text-xs text-slate-400">Requirement 20 (8-Stage Lifecycle &amp; Artifact Defense)</span>
+            <span className="text-xs text-slate-300">•</span>
+            <span className="text-xs text-slate-400">8-Stage Lifecycle &amp; Artifact Defense</span>
           </div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight">
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
             Advanced Systems Milestone (ASM) Lifecycle
           </h1>
           <p className="text-xs text-slate-500 mt-1">
@@ -119,9 +120,9 @@ export function ASMLifecyclePage({ associateId = 'as-ananya' }: ASMLifecyclePage
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowScoreModal(true)}
-            className="px-4 py-2.5 rounded-xl bg-[#132846] hover:bg-[#1a365d] text-white font-bold text-xs transition shadow-lg flex items-center gap-2"
+            className="px-4 py-2.5 rounded-xl bg-[#007df0] hover:bg-[#0069cc] text-white font-bold text-xs transition shadow-xs flex items-center gap-2"
           >
-            <ShieldCheck className="w-4 h-4 text-emerald-400" />
+            <ShieldCheck className="w-4 h-4" />
             <span>Score Board Defense</span>
           </button>
         </div>
@@ -129,17 +130,17 @@ export function ASMLifecyclePage({ associateId = 'as-ananya' }: ASMLifecyclePage
 
       {currentProject && (
         <div className="space-y-6">
-          {/* 8-Stage Milestone Progress Ribbon (Requirement 20) */}
-          <div className="p-6 rounded-2xl bg-slate-950 border border-slate-800 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+          {/* 8-Stage Milestone Progress Ribbon */}
+          <Card className="p-6 space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-400">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#007df0]">
                   {currentProject.project_code} • {currentProject.pathway}
                 </span>
-                <h2 className="text-base font-bold text-white mt-0.5">{currentProject.project_title}</h2>
+                <h2 className="text-base font-bold text-slate-900 mt-0.5">{currentProject.project_title}</h2>
               </div>
               <div className="flex items-center gap-2">
-                <span className="px-3 py-1 text-xs font-black rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                <span className="px-3 py-1 text-xs font-bold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
                   Composite Score: {currentProject.composite_score} / 5.0
                 </span>
               </div>
@@ -155,29 +156,29 @@ export function ASMLifecyclePage({ associateId = 'as-ananya' }: ASMLifecyclePage
                 return (
                   <div
                     key={stg.key}
-                    className={`p-3 rounded-xl border text-center transition flex flex-col justify-between h-20 ${
+                    className={`p-3 rounded-xl border text-center transition-all flex flex-col justify-between h-20 ${
                       isCurrent
-                        ? 'bg-indigo-600/30 border-indigo-500 text-white shadow-lg'
+                        ? 'bg-sky-50 border-[#007df0] text-[#007df0] shadow-xs font-bold'
                         : isPassed
-                        ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-300'
-                        : 'bg-slate-900/60 border-slate-800 text-slate-500'
+                        ? 'bg-emerald-50/60 border-emerald-200 text-emerald-800'
+                        : 'bg-slate-50 border-slate-200 text-slate-400'
                     }`}
                   >
                     <div className="text-[10px] font-bold uppercase truncate">{stg.label}</div>
                     <div className="flex items-center justify-center">
                       {isPassed ? (
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                       ) : isCurrent ? (
-                        <Sparkles className="w-4 h-4 text-indigo-400 animate-spin" />
+                        <Sparkles className="w-4 h-4 text-[#007df0] animate-spin" />
                       ) : (
-                        <Clock className="w-4 h-4 text-slate-600" />
+                        <Clock className="w-4 h-4 text-slate-400" />
                       )}
                     </div>
                   </div>
                 )
               })}
             </div>
-          </div>
+          </Card>
 
           {/* Project Artifacts Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -185,28 +186,28 @@ export function ASMLifecyclePage({ associateId = 'as-ananya' }: ASMLifecyclePage
             <div className="lg:col-span-2 space-y-6">
               {/* Telemetry Strip */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-md">
+                <Card className="p-4">
                   <div className="text-[10px] font-bold text-slate-400 uppercase">P99 Latency (Load Stress)</div>
                   <div className="text-2xl font-black text-slate-900 mt-1">{currentProject.artifacts.benchmark_p99_latency_ms} ms</div>
-                  <div className="text-[10px] text-emerald-600 font-bold mt-0.5">SLA Target &lt; 15.0 ms</div>
-                </div>
+                  <div className="text-[10.5px] text-emerald-600 font-bold mt-0.5">SLA Target &lt; 15.0 ms</div>
+                </Card>
 
-                <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-md">
+                <Card className="p-4">
                   <div className="text-[10px] font-bold text-slate-400 uppercase">Throughput Benchmark</div>
                   <div className="text-2xl font-black text-slate-900 mt-1">{currentProject.artifacts.benchmark_throughput_tps} TPS</div>
-                  <div className="text-[10px] text-indigo-600 font-bold mt-0.5">Zero deadlocks recorded</div>
-                </div>
+                  <div className="text-[10.5px] text-[#007df0] font-bold mt-0.5">Zero deadlocks recorded</div>
+                </Card>
 
-                <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-md">
+                <Card className="p-4">
                   <div className="text-[10px] font-bold text-slate-400 uppercase">SonarQube / Security Scan</div>
                   <div className="text-2xl font-black text-emerald-600 mt-1">PASSED (0 Vulns)</div>
-                  <div className="text-[10px] text-slate-500 mt-0.5">Static analysis verified</div>
-                </div>
+                  <div className="text-[10.5px] text-slate-500 mt-0.5">Static analysis verified</div>
+                </Card>
               </div>
 
               {/* Artifact Submissions List */}
-              <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-xl space-y-4">
-                <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
+              <Card className="p-6 space-y-4">
+                <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
                   Submitted Verification Artifacts
                 </h3>
 
@@ -214,10 +215,10 @@ export function ASMLifecyclePage({ associateId = 'as-ananya' }: ASMLifecyclePage
                   <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex items-start justify-between gap-4">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <FileText className="w-4 h-4 text-indigo-600" />
+                        <FileText className="w-4 h-4 text-[#007df0]" />
                         <span className="text-xs font-bold text-slate-900">Architecture RFC Document</span>
                       </div>
-                      <p className="text-xs text-slate-600">
+                      <p className="text-xs text-slate-600 leading-relaxed">
                         Formal design specification for concurrent idempotency key deduplication and distributed saga orchestration.
                       </p>
                     </div>
@@ -225,7 +226,7 @@ export function ASMLifecyclePage({ associateId = 'as-ananya' }: ASMLifecyclePage
                       href={currentProject.artifacts.rfc_doc_url}
                       target="_blank"
                       rel="noreferrer"
-                      className="px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-xs font-bold text-indigo-700 hover:bg-slate-50 flex items-center gap-1 shrink-0"
+                      className="px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-xs font-bold text-[#007df0] hover:bg-slate-50 flex items-center gap-1 shrink-0 shadow-2xs"
                     >
                       <span>View RFC</span>
                       <ExternalLink className="w-3 h-3" />
@@ -238,7 +239,7 @@ export function ASMLifecyclePage({ associateId = 'as-ananya' }: ASMLifecyclePage
                         <GitBranch className="w-4 h-4 text-emerald-600" />
                         <span className="text-xs font-bold text-slate-900">Pull Request (Merged to Staging)</span>
                       </div>
-                      <p className="text-xs text-slate-600">
+                      <p className="text-xs text-slate-600 leading-relaxed">
                         Production repository pull request with 94% mutation test coverage and clean CI pipeline runs.
                       </p>
                     </div>
@@ -246,7 +247,7 @@ export function ASMLifecyclePage({ associateId = 'as-ananya' }: ASMLifecyclePage
                       href={currentProject.artifacts.pr_url}
                       target="_blank"
                       rel="noreferrer"
-                      className="px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-xs font-bold text-emerald-700 hover:bg-slate-50 flex items-center gap-1 shrink-0"
+                      className="px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-xs font-bold text-emerald-700 hover:bg-slate-50 flex items-center gap-1 shrink-0 shadow-2xs"
                     >
                       <span>PR #14</span>
                       <ExternalLink className="w-3 h-3" />
@@ -258,48 +259,50 @@ export function ASMLifecyclePage({ associateId = 'as-ananya' }: ASMLifecyclePage
                       <Zap className="w-4 h-4 text-amber-600" />
                       <span className="text-xs font-bold text-slate-900">Chaos Mesh Resilience Report</span>
                     </div>
-                    <p className="text-xs text-slate-600">{currentProject.artifacts.chaos_experiment_summary}</p>
+                    <p className="text-xs text-slate-600 leading-relaxed">{currentProject.artifacts.chaos_experiment_summary}</p>
                   </div>
                 </div>
-              </div>
+              </Card>
             </div>
 
-            {/* Right Col: Multi-Examiner Board Defense Panel (Requirement 20) */}
+            {/* Right Col: Multi-Examiner Board Defense Panel */}
             <div className="space-y-5">
-              <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 text-white shadow-xl space-y-4">
-                <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <Card className="p-6 space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                   <div className="flex items-center gap-2">
-                    <Users className="w-4 h-4 text-indigo-400" />
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-white">
+                    <Users className="w-4 h-4 text-[#007df0]" />
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900">
                       Examiner Defense Panel ({currentProject.panel_examiners.length})
                     </h3>
                   </div>
-                  <span className="text-xs font-bold text-emerald-400">Unanimous Pass</span>
+                  <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                    Unanimous Pass
+                  </span>
                 </div>
 
                 <div className="space-y-3">
                   {currentProject.panel_examiners.map((examiner) => (
-                    <div key={examiner.examiner_id} className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800 space-y-2">
+                    <div key={examiner.examiner_id} className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
                       <div className="flex items-center justify-between">
                         <div>
-                          <div className="text-xs font-bold text-white">{examiner.examiner_name}</div>
-                          <div className="text-[10px] text-slate-400">{examiner.examiner_role.replace('_', ' ')}</div>
+                          <div className="text-xs font-bold text-slate-900">{examiner.examiner_name}</div>
+                          <div className="text-[10px] text-slate-500 font-semibold">{examiner.examiner_role.replace('_', ' ')}</div>
                         </div>
                         <div className="text-right">
-                          <div className="text-xs font-black text-purple-300">{examiner.overall_score} / 5.0</div>
-                          <span className="px-1.5 py-0.2 text-[9px] font-bold rounded bg-emerald-500/20 text-emerald-300">
+                          <div className="text-xs font-black text-slate-900">{examiner.overall_score} / 5.0</div>
+                          <span className="px-1.5 py-0.2 text-[9px] font-bold rounded bg-emerald-100 text-emerald-800">
                             {examiner.recommendation}
                           </span>
                         </div>
                       </div>
 
-                      <p className="text-[11px] text-slate-300 italic border-t border-slate-800/60 pt-2">
+                      <p className="text-[11px] text-slate-600 italic border-t border-slate-200 pt-2 leading-relaxed">
                         "{examiner.deliberation_notes}"
                       </p>
                     </div>
                   ))}
                 </div>
-              </div>
+              </Card>
             </div>
           </div>
         </div>
@@ -308,7 +311,7 @@ export function ASMLifecyclePage({ associateId = 'as-ananya' }: ASMLifecyclePage
       {/* Score Modal */}
       <AnimatePresence>
         {showScoreModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/40 backdrop-blur-xs">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -333,8 +336,8 @@ export function ASMLifecyclePage({ associateId = 'as-ananya' }: ASMLifecyclePage
                 ].map((item) => (
                   <div key={item.key} className="space-y-1">
                     <div className="flex justify-between font-semibold">
-                      <span>{item.label}</span>
-                      <span className="font-mono font-bold text-indigo-700">{rubricScores[item.key]} / 5.0</span>
+                      <span className="text-slate-700">{item.label}</span>
+                      <span className="font-mono font-bold text-[#007df0]">{rubricScores[item.key]} / 5.0</span>
                     </div>
                     <input
                       type="range"
@@ -345,7 +348,7 @@ export function ASMLifecyclePage({ associateId = 'as-ananya' }: ASMLifecyclePage
                       onChange={(e) =>
                         setRubricScores({ ...rubricScores, [item.key]: parseFloat(e.target.value) })
                       }
-                      className="w-full accent-indigo-600"
+                      className="w-full accent-[#007df0]"
                     />
                   </div>
                 ))}
@@ -356,7 +359,7 @@ export function ASMLifecyclePage({ associateId = 'as-ananya' }: ASMLifecyclePage
                     rows={2}
                     value={deliberationNotes}
                     onChange={(e) => setDeliberationNotes(e.target.value)}
-                    className="w-full p-2.5 text-xs rounded-xl border border-slate-300 outline-none focus:border-indigo-500"
+                    className="w-full p-2.5 text-xs rounded-xl border border-slate-200 outline-none focus:border-[#007df0]"
                   />
                 </div>
               </div>
@@ -371,7 +374,7 @@ export function ASMLifecyclePage({ associateId = 'as-ananya' }: ASMLifecyclePage
                 <button
                   onClick={handleScoreSubmit}
                   disabled={scoreMutation.isPending}
-                  className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs transition"
+                  className="px-5 py-2 rounded-xl bg-[#007df0] hover:bg-[#0069cc] text-white font-bold text-xs transition shadow-xs"
                 >
                   {scoreMutation.isPending ? 'Submitting...' : 'Sign & Ratify Defense'}
                 </button>

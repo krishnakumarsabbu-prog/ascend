@@ -153,7 +153,7 @@ export function IntegrationHubPage() {
                 <button
                   onClick={() => syncMutation.mutate(c.id)}
                   disabled={syncMutation.isPending}
-                  className="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition flex items-center justify-center gap-2 shadow-sm"
+                  className="w-full py-2.5 rounded-xl bg-[#007df0] hover:bg-[#0069cc] text-white font-bold text-xs transition flex items-center justify-center gap-2 shadow-xs"
                 >
                   <RefreshCw className={`w-3.5 h-3.5 ${syncMutation.isPending ? 'animate-spin' : ''}`} />
                   <span>{syncMutation.isPending ? 'Triggering Sync...' : 'Trigger Sync Now'}</span>

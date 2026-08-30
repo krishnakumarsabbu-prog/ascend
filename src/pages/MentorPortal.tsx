@@ -73,21 +73,23 @@ export function MentorPortal({ user }: { user: User }) {
       </div>
 
       {/* Tabs */}
-      <div className="flex flex-wrap gap-2 border-b border-slate-200 pb-px">
+      <div className="flex flex-wrap gap-1 border-b border-slate-200 pb-px">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setView(tab.id)}
-            className={`flex items-center gap-2 border-b-2 px-3.5 py-2.5 text-xs font-bold transition-colors ${
+            className={`flex items-center gap-2 border-b-2 px-4 py-2.5 text-xs font-bold transition-all ${
               view === tab.id
-                ? 'border-blue-600 text-blue-700'
-                : 'border-transparent text-slate-500 hover:text-slate-800'
+                ? 'border-[#007df0] text-[#007df0]'
+                : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-800'
             }`}
           >
-            <tab.icon size={14} />
+            <tab.icon size={14} className={view === tab.id ? 'text-[#007df0]' : 'text-slate-400'} />
             {tab.label}
             {tab.badge && (
-              <span className="rounded bg-blue-100 px-1.5 py-0.2 text-[9px] font-bold text-blue-700">
+              <span className={`rounded px-1.5 py-0.2 text-[9px] font-bold ${
+                view === tab.id ? 'bg-sky-100 text-sky-800' : 'bg-slate-100 text-slate-600'
+              }`}>
                 {tab.badge}
               </span>
             )}
@@ -112,13 +114,13 @@ export function MentorPortal({ user }: { user: User }) {
                   <h2 className="text-sm font-bold text-slate-900">Portfolio signal</h2>
                   <p className="mt-0.5 text-xs text-slate-400">Prioritize the next meaningful coaching conversation.</p>
                 </div>
-                <div className="flex flex-wrap gap-1 rounded-md bg-slate-100 p-1">
+                <div className="flex flex-wrap gap-1 rounded-lg bg-slate-100 p-1 border border-slate-200/80">
                   {(['ALL', 'ON_TRACK', 'AT_RISK', 'NEEDS_ATTENTION'] as const).map((option) => (
                     <button
                       key={option}
                       onClick={() => setFilter(option)}
-                      className={`rounded px-2.5 py-1.5 text-[10px] font-bold transition-colors ${
-                        filter === option ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'
+                      className={`rounded-md px-2.5 py-1 text-[10.5px] font-bold transition-all ${
+                        filter === option ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-500 hover:text-slate-800'
                       }`}
                     >
                       {option === 'ALL' ? 'All' : riskLabel[option]}
@@ -161,11 +163,10 @@ export function MentorPortal({ user }: { user: User }) {
         </div>
       )}
 
-      {/* View: Waiver Recommendations (Matching Screenshot 4) */}
+      {/* View: Waiver Recommendations */}
       {view === 'waivers' && (
         <div className="space-y-6">
-          {/* Waiver Rule Banner matching Screenshot 4 */}
-          <div className="rounded-xl border border-slate-200 bg-[#f9f9f6] p-4 text-xs text-slate-700 shadow-sm">
+          <div className="rounded-xl border border-slate-200 bg-slate-50/80 p-4 text-xs text-slate-700 shadow-2xs">
             <p>
               <strong>Waiver Rule.</strong> Associates scoring ≥ 80% on a WF assessment become eligible to waive corresponding foundational curriculum modules upon mentor recommendation and committee ratification.
             </p>

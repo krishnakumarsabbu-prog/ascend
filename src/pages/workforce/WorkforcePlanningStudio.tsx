@@ -16,6 +16,7 @@ import {
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { api } from '../../lib/api'
 import type { WorkforceScenarioRequest, WorkforceScenarioResult } from '../../types'
+import { Card } from '../../components/ui'
 
 export function WorkforcePlanningStudio() {
   const [scenarioName, setScenarioName] = useState('Accelerated AI Transition Q4')
@@ -252,10 +253,10 @@ export function WorkforcePlanningStudio() {
               </div>
 
               {/* Projected Quarterly Production Throughput Table */}
-              <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 text-white shadow-xl space-y-4">
-                <div className="flex items-center gap-2 border-b border-slate-800 pb-3">
-                  <Calendar className="w-4 h-4 text-indigo-400" />
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-white">
+              <Card className="p-6 space-y-4">
+                <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
+                  <Calendar className="w-4 h-4 text-[#007df0]" />
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800">
                     Quarterly Production Pipeline Projection
                   </h3>
                 </div>
@@ -263,28 +264,28 @@ export function WorkforcePlanningStudio() {
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs">
                     <thead>
-                      <tr className="border-b border-slate-800 text-[10px] font-bold text-slate-400 uppercase">
-                        <th className="pb-2">Quarter</th>
-                        <th className="pb-2">Intake Sizing</th>
-                        <th className="pb-2">In-Training Pipeline</th>
-                        <th className="pb-2">Production Ready</th>
-                        <th className="pb-2 text-right">Demand Met %</th>
+                      <tr className="border-b border-slate-200 text-[10px] font-bold text-slate-500 uppercase bg-slate-50/80">
+                        <th className="px-3 py-2.5">Quarter</th>
+                        <th className="px-3 py-2.5">Intake Sizing</th>
+                        <th className="px-3 py-2.5">In-Training Pipeline</th>
+                        <th className="px-3 py-2.5">Production Ready</th>
+                        <th className="px-3 py-2.5 text-right">Demand Met %</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-800/80">
+                    <tbody className="divide-y divide-slate-100">
                       {result.quarterly_pipeline.map((q) => (
-                        <tr key={q.quarter} className="text-slate-200">
-                          <td className="py-2.5 font-bold text-white">{q.quarter}</td>
-                          <td className="py-2.5 font-mono">{q.intake}</td>
-                          <td className="py-2.5 font-mono">{q.in_training}</td>
-                          <td className="py-2.5 font-mono font-bold text-purple-300">{q.production_ready} engineers</td>
-                          <td className="py-2.5 font-mono text-right font-bold text-emerald-400">{q.demand_met_pct}%</td>
+                        <tr key={q.quarter} className="text-slate-700 hover:bg-slate-50/60 transition-colors">
+                          <td className="px-3 py-3 font-bold text-slate-900">{q.quarter}</td>
+                          <td className="px-3 py-3 font-mono text-slate-600">{q.intake}</td>
+                          <td className="px-3 py-3 font-mono text-slate-600">{q.in_training}</td>
+                          <td className="px-3 py-3 font-mono font-bold text-sky-700">{q.production_ready} engineers</td>
+                          <td className="px-3 py-3 font-mono text-right font-bold text-emerald-600">{q.demand_met_pct}%</td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
-              </div>
+              </Card>
             </>
           )}
         </div>

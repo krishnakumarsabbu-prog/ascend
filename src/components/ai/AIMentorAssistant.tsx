@@ -17,6 +17,7 @@ import {
 import { useQuery } from '@tanstack/react-query'
 import { api } from '../../lib/api'
 import type { AIMentorBrief } from '../../types'
+import { Card } from '../ui'
 
 interface AIMentorAssistantProps {
   initialAssociateId?: string
@@ -125,20 +126,20 @@ export function AIMentorAssistant({ initialAssociateId = 'as-ananya' }: AIMentor
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="mt-4 p-4 rounded-xl bg-slate-950/80 border border-purple-500/30 text-xs text-slate-200 leading-relaxed space-y-2"
+              className="mt-4 p-4 rounded-xl bg-sky-50/70 border border-sky-200 text-xs text-slate-800 leading-relaxed space-y-2"
             >
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-purple-400 flex items-center gap-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#007df0] flex items-center gap-1">
                   <Sparkles className="w-3.5 h-3.5" /> AI Mentor Assistant Analysis
                 </span>
                 <button
                   onClick={() => setActiveQueryAnswer(null)}
-                  className="text-[11px] text-slate-400 hover:text-white"
+                  className="text-[11px] text-slate-400 hover:text-slate-700"
                 >
                   Dismiss
                 </button>
               </div>
-              <div className="whitespace-pre-wrap">{activeQueryAnswer}</div>
+              <div className="whitespace-pre-wrap font-medium text-slate-700">{activeQueryAnswer}</div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -151,21 +152,21 @@ export function AIMentorAssistant({ initialAssociateId = 'as-ananya' }: AIMentor
           <button
             key={b.associate_id}
             onClick={() => setSelectedAssociateId(b.associate_id)}
-            className={`px-4 py-2 text-xs font-bold rounded-xl border transition flex items-center gap-2 shrink-0 ${
+            className={`px-4 py-2 text-xs font-bold rounded-xl border transition-all flex items-center gap-2 shrink-0 ${
               selectedAssociateId === b.associate_id
-                ? 'bg-purple-600 text-white border-purple-500 shadow-lg shadow-purple-600/20'
-                : 'bg-slate-900 text-slate-300 border-slate-800 hover:border-slate-700'
+                ? 'bg-[#007df0] text-white border-[#007df0] shadow-xs'
+                : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'
             }`}
           >
             <Users className="w-3.5 h-3.5" />
             <span>{b.associate_name}</span>
             <span
-              className={`px-1.5 py-0.5 text-[9px] font-black rounded ${
+              className={`px-1.5 py-0.5 text-[9px] font-bold rounded ${
                 b.status === 'NEEDS_ATTENTION'
-                  ? 'bg-rose-500/30 text-rose-200'
+                  ? 'bg-rose-50 text-rose-700'
                   : b.status === 'FAST_TRACK'
-                  ? 'bg-emerald-500/30 text-emerald-200'
-                  : 'bg-slate-700 text-slate-300'
+                  ? 'bg-emerald-50 text-emerald-700'
+                  : 'bg-slate-100 text-slate-600'
               }`}
             >
               {b.status.replace('_', ' ')}
@@ -174,24 +175,24 @@ export function AIMentorAssistant({ initialAssociateId = 'as-ananya' }: AIMentor
         ))}
       </div>
 
-      {/* Formatted Mentor Brief (Requirement 10) */}
+      {/* Formatted Mentor Brief */}
       {brief && (
-        <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-2xl space-y-6">
+        <Card className="p-6 space-y-6">
           {/* Brief Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 border-b border-slate-800 gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 border-b border-slate-100 gap-4">
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <span className="text-xs font-bold text-purple-400">{brief.cohort}</span>
-                <span className="text-slate-600">•</span>
-                <span className="text-xs text-slate-400">{brief.pathway}</span>
+                <span className="text-xs font-bold text-[#007df0]">{brief.cohort}</span>
+                <span className="text-slate-300">•</span>
+                <span className="text-xs text-slate-500">{brief.pathway}</span>
               </div>
-              <h3 className="text-xl font-bold text-white tracking-tight flex items-center gap-3">
+              <h3 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-3">
                 <span>Mentor Brief: {brief.associate_name}</span>
                 <span
-                  className={`px-2.5 py-0.5 text-xs font-black rounded-full border ${
+                  className={`px-2.5 py-0.5 text-xs font-bold rounded-full border ${
                     brief.status === 'NEEDS_ATTENTION'
-                      ? 'bg-rose-500/10 text-rose-400 border-rose-500/30'
-                      : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
+                      ? 'bg-rose-50 text-rose-700 border-rose-200'
+                      : 'bg-emerald-50 text-emerald-700 border-emerald-200'
                   }`}
                 >
                   {brief.status.replace('_', ' ')}
@@ -201,33 +202,33 @@ export function AIMentorAssistant({ initialAssociateId = 'as-ananya' }: AIMentor
 
             <div className="text-right">
               <div className="text-xs text-slate-400">Overall Readiness</div>
-              <div className="text-2xl font-black text-white">{brief.overall_readiness}%</div>
+              <div className="text-2xl font-black text-slate-900">{brief.overall_readiness}%</div>
             </div>
           </div>
 
           {/* Primary Concern Banner */}
-          <div className="p-4 rounded-xl bg-slate-950/70 border border-rose-500/30 flex items-start gap-3">
-            <div className="p-1.5 rounded-lg bg-rose-500/20 text-rose-400 shrink-0">
+          <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 flex items-start gap-3">
+            <div className="p-1.5 rounded-lg bg-rose-100 text-rose-700 shrink-0">
               <AlertTriangle className="w-4 h-4" />
             </div>
             <div>
-              <span className="text-[10px] font-black uppercase tracking-wider text-rose-400">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-rose-700">
                 Primary Mentoring Focus
               </span>
-              <h4 className="text-sm font-bold text-white mt-0.5">{brief.primary_concern}</h4>
+              <h4 className="text-sm font-bold text-slate-900 mt-0.5">{brief.primary_concern}</h4>
             </div>
           </div>
 
           {/* Evidence Grid */}
           <div>
-            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">
               Telemetry Evidence Summary
             </h4>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {Object.entries(brief.evidence_summary).map(([key, val]) => (
-                <div key={key} className="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800">
-                  <div className="text-[10px] font-medium text-slate-400 uppercase">{key}</div>
-                  <div className="text-xs font-bold text-slate-200 mt-1">{val}</div>
+                <div key={key} className="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+                  <div className="text-[10px] font-semibold text-slate-400 uppercase">{key}</div>
+                  <div className="text-xs font-bold text-slate-800 mt-1">{val}</div>
                 </div>
               ))}
             </div>
@@ -236,15 +237,15 @@ export function AIMentorAssistant({ initialAssociateId = 'as-ananya' }: AIMentor
           {/* Recommended Mentor Actions & Talking Points */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {/* Actions */}
-            <div className="p-5 rounded-xl bg-slate-950/60 border border-slate-800 space-y-3">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-purple-400 flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-purple-400" />
+            <div className="p-5 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-[#007df0] flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-[#007df0]" />
                 Recommended Mentor Actions
               </h4>
               <ul className="space-y-2">
                 {brief.recommended_actions.map((act, idx) => (
-                  <li key={idx} className="text-xs text-slate-300 flex items-start gap-2">
-                    <span className="font-bold text-purple-400">{idx + 1}.</span>
+                  <li key={idx} className="text-xs text-slate-700 flex items-start gap-2">
+                    <span className="font-bold text-[#007df0]">{idx + 1}.</span>
                     <span>{act}</span>
                   </li>
                 ))}
@@ -252,22 +253,22 @@ export function AIMentorAssistant({ initialAssociateId = 'as-ananya' }: AIMentor
             </div>
 
             {/* Talking Points */}
-            <div className="p-5 rounded-xl bg-slate-950/60 border border-slate-800 space-y-3">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-1.5">
-                <Sparkles className="w-4 h-4 text-indigo-400" />
-                1:1 Check-In Talking Points
+            <div className="p-5 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-amber-700 flex items-center gap-1.5">
+                <Sparkles className="w-4 h-4 text-amber-600" />
+                1-on-1 Coaching Talking Points
               </h4>
               <ul className="space-y-2">
                 {brief.talking_points.map((pt, idx) => (
-                  <li key={idx} className="text-xs text-slate-300 flex items-start gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 shrink-0 mt-1.5" />
+                  <li key={idx} className="text-xs text-slate-700 flex items-start gap-2">
+                    <span className="font-bold text-amber-600">•</span>
                     <span>{pt}</span>
                   </li>
                 ))}
               </ul>
             </div>
           </div>
-        </div>
+        </Card>
       )}
     </div>
   )

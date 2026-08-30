@@ -1,4 +1,4 @@
-import { StrictMode, useMemo } from 'react'
+import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
@@ -50,23 +50,28 @@ import { IntegrationHubPage } from './pages/integrations/IntegrationHubPage'
 import { SystemControlCenter } from './pages/admin/SystemControlCenter'
 import { MySkills } from './pages/skills/MySkills'
 import { AICoachPage } from './pages/ai/AICoachPage'
-import type { RoleId } from './types'
 import './styles.css'
 
-
-const queryClient = new QueryClient({ defaultOptions: { queries: { staleTime: 30_000, retry: 1 } } })
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 30_000,
+      retry: 1,
+    },
+  },
+})
 
 function AppRoutes() {
-  const { user, role, switchRole, activeAssociateId, switchAssociate } = useAuth()
+  const { user, role, activeAssociateId } = useAuth()
   const associatesQuery = useQuery({ queryKey: ['associates'], queryFn: api.associates })
 
   const associates = associatesQuery.data || []
-  const dashboardAssociateId = role === 'EARLY_TALENT' ? activeAssociateId : 'as-ananya'
+  const userAssociateId = activeAssociateId || 'as-ananya'
 
   const dashboardQuery = useQuery({
-    queryKey: ['dashboard', dashboardAssociateId],
-    queryFn: () => api.dashboard(dashboardAssociateId),
-    enabled: Boolean(associatesQuery.data && user),
+    queryKey: ['dashboard', userAssociateId],
+    queryFn: () => api.dashboard(userAssociateId),
+    enabled: Boolean(associatesQuery.data && user && role === 'EARLY_TALENT'),
   })
 
   return (
@@ -81,13 +86,11 @@ function AppRoutes() {
             <AppShell
               role={role}
               user={user!}
-              onRoleChange={switchRole}
               associates={associates}
-              activeAssociateId={activeAssociateId}
-              onAssociateChange={switchAssociate}
+              activeAssociateId={userAssociateId}
             >
               <Routes>
-                {/* Default Role Root Route */}
+                {/* 1. Default Role Root Route */}
                 <Route
                   path="/"
                   element={
@@ -105,11 +108,30 @@ function AppRoutes() {
                   }
                 />
 
-                {/* HackerRank-Grade Coding IDE & Problem Catalog */}
+                {/* 2. Intern / Early Talent Learning & Practice Workflows */}
+                <Route path="/curriculum" element={<Curriculum />} />
+                <Route path="/pathways" element={<PathwaySelection associateId={userAssociateId} />} />
                 <Route path="/challenges" element={<PracticeChallenges />} />
                 <Route path="/coding/:challengeId" element={<CodingWorkspace />} />
+                <Route path="/take-assessment" element={<TakeAssessment />} />
+                <Route path="/assessment/:courseId" element={<Assessment />} />
+                <Route path="/assessment/result/:attemptId" element={<AssessmentResult />} />
+                <Route path="/adaptive-assessment" element={<AdaptiveAssessmentPage associateId={userAssociateId} />} />
+                <Route path="/asm-lifecycle" element={<ASMLifecyclePage associateId={userAssociateId} />} />
+                <Route path="/my-skills" element={<MySkills associateId={userAssociateId} />} />
+                <Route path="/credentials" element={<CredentialsWallet associateId={userAssociateId} />} />
+                <Route path="/talent-marketplace" element={<TalentMarketplacePage associateId={userAssociateId} />} />
+                <Route path="/ai-coach" element={<AICoachPage associateId={userAssociateId} />} />
+                <Route path="/asm" element={<AsmJourney associateId={userAssociateId} />} />
+                <Route path="/commissioning" element={<AsmJourney associateId={userAssociateId} />} />
+                <Route path="/wf-assessments" element={<WFAssessmentsPage />} />
+                <Route path="/asm-fork" element={<ASMForkPage />} />
+                <Route path="/advanced-intensives" element={<AdvancedIntensivesPage />} />
+                <Route path="/architect-board" element={<ArchitectBoardPage />} />
+                <Route path="/credit-ledger" element={<CreditLedgerPage />} />
+                <Route path="/program-overview" element={<ProgramOverviewPage />} />
 
-                {/* Role Specific Portals */}
+                {/* 3. Mentor / Coach Dedicated Workflows */}
                 <Route
                   path="/mentor"
                   element={
@@ -118,6 +140,8 @@ function AppRoutes() {
                     </ProtectedRoute>
                   }
                 />
+
+                {/* 4. Engineering Excellence Committee Governance & Content Studios */}
                 <Route
                   path="/committee"
                   element={
@@ -127,64 +151,151 @@ function AppRoutes() {
                   }
                 />
                 <Route
-                  path="/sponsor"
+                  path="/admin/questions"
                   element={
-                    <ProtectedRoute allowedRoles={['SENIOR_LEADER_SPONSOR']}>
-                      <SponsorPortal />
+                    <ProtectedRoute allowedRoles={['ENGINEERING_EXCELLENCE_COMMITTEE']}>
+                      <QuestionStudio />
                     </ProtectedRoute>
                   }
                 />
                 <Route
+                  path="/admin/question-governance"
+                  element={
+                    <ProtectedRoute allowedRoles={['ENGINEERING_EXCELLENCE_COMMITTEE']}>
+                      <QuestionLifecycleStudio />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/courses"
+                  element={
+                    <ProtectedRoute allowedRoles={['ENGINEERING_EXCELLENCE_COMMITTEE']}>
+                      <CourseStudio />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/curriculum-versions"
+                  element={
+                    <ProtectedRoute allowedRoles={['ENGINEERING_EXCELLENCE_COMMITTEE']}>
+                      <CurriculumBranchingStudio />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/users"
+                  element={
+                    <ProtectedRoute allowedRoles={['ENGINEERING_EXCELLENCE_COMMITTEE']}>
+                      <UserManager />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/control-center"
+                  element={
+                    <ProtectedRoute allowedRoles={['ENGINEERING_EXCELLENCE_COMMITTEE']}>
+                      <SystemControlCenter />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/workflows"
+                  element={
+                    <ProtectedRoute allowedRoles={['ENGINEERING_EXCELLENCE_COMMITTEE']}>
+                      <WorkflowDesigner />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/metric-lineage"
+                  element={
+                    <ProtectedRoute allowedRoles={['ENGINEERING_EXCELLENCE_COMMITTEE']}>
+                      <MetricLineageStudio />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/audit-center"
+                  element={
+                    <ProtectedRoute allowedRoles={['ENGINEERING_EXCELLENCE_COMMITTEE']}>
+                      <AuditCenterPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/integrations"
+                  element={
+                    <ProtectedRoute allowedRoles={['ENGINEERING_EXCELLENCE_COMMITTEE']}>
+                      <IntegrationHubPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/dashboard-builder"
+                  element={
+                    <ProtectedRoute allowedRoles={['ENGINEERING_EXCELLENCE_COMMITTEE', 'SENIOR_LEADER_SPONSOR', 'TECHNOLOGY_HEAD']}>
+                      <CustomDashboardBuilder />
+                    </ProtectedRoute>
+                  }
+                />
+
+                {/* 5. Senior Leader Sponsor Portal */}
+                <Route
+                  path="/sponsor"
+                  element={
+                    <ProtectedRoute allowedRoles={['SENIOR_LEADER_SPONSOR', 'TECHNOLOGY_HEAD']}>
+                      <SponsorPortal />
+                    </ProtectedRoute>
+                  }
+                />
+
+                {/* 6. Technology Head Portal */}
+                <Route
                   path="/techhead"
                   element={
-                    <ProtectedRoute allowedRoles={['TECHNOLOGY_HEAD', 'ENGINEERING_EXCELLENCE_COMMITTEE']}>
+                    <ProtectedRoute allowedRoles={['TECHNOLOGY_HEAD']}>
                       <TechHeadPortal />
                     </ProtectedRoute>
                   }
                 />
 
-                {/* Early Talent Subpages & Workflows */}
-                <Route path="/my-skills" element={<MySkills associateId={dashboardAssociateId} />} />
-                <Route path="/talent-marketplace" element={<TalentMarketplacePage associateId={dashboardAssociateId} />} />
-                <Route path="/credentials" element={<CredentialsWallet associateId={dashboardAssociateId} />} />
-                <Route path="/ai-coach" element={<AICoachPage associateId={dashboardAssociateId} />} />
-                <Route path="/adaptive-assessment" element={<AdaptiveAssessmentPage associateId={dashboardAssociateId} />} />
-                <Route path="/asm-lifecycle" element={<ASMLifecyclePage associateId={dashboardAssociateId} />} />
-                <Route path="/workforce-planning" element={<WorkforcePlanningStudio />} />
-                <Route path="/pathways" element={<PathwaySelection associateId={dashboardAssociateId} />} />
-                <Route path="/asm" element={<AsmJourney associateId={dashboardAssociateId} />} />
-                <Route path="/commissioning" element={<AsmJourney associateId={dashboardAssociateId} />} />
-                <Route path="/curriculum" element={<Curriculum />} />
-                <Route path="/take-assessment" element={<TakeAssessment />} />
-                <Route path="/wf-assessments" element={<WFAssessmentsPage />} />
-                <Route path="/asm-fork" element={<ASMForkPage />} />
-                <Route path="/advanced-intensives" element={<AdvancedIntensivesPage />} />
-                <Route path="/architect-board" element={<ArchitectBoardPage />} />
-                <Route path="/credit-ledger" element={<CreditLedgerPage />} />
-                <Route path="/program-overview" element={<ProgramOverviewPage />} />
-                <Route path="/assessment/:courseId" element={<Assessment />} />
-                <Route path="/assessment/result/:attemptId" element={<AssessmentResult />} />
+                {/* 7. Executive Decision & Workforce Analytics */}
+                <Route
+                  path="/workforce-planning"
+                  element={
+                    <ProtectedRoute allowedRoles={['SENIOR_LEADER_SPONSOR', 'TECHNOLOGY_HEAD', 'ENGINEERING_EXCELLENCE_COMMITTEE']}>
+                      <WorkforcePlanningStudio />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/analytics"
+                  element={
+                    <ProtectedRoute allowedRoles={['ENGINEERING_EXCELLENCE_COMMITTEE', 'SENIOR_LEADER_SPONSOR', 'TECHNOLOGY_HEAD']}>
+                      <ExecutiveAnalyticsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/reports"
+                  element={
+                    <ProtectedRoute allowedRoles={['ENGINEERING_EXCELLENCE_COMMITTEE', 'SENIOR_LEADER_SPONSOR', 'TECHNOLOGY_HEAD']}>
+                      <EnterpriseReportingPage />
+                    </ProtectedRoute>
+                  }
+                />
 
-                {/* Product Administration & Authoring Studios */}
-                <Route path="/admin/users" element={<UserManager />} />
-                <Route path="/admin/courses" element={<CourseStudio />} />
-                <Route path="/admin/questions" element={<QuestionStudio />} />
-                <Route path="/admin/workflows" element={<WorkflowDesigner />} />
-                <Route path="/admin/question-governance" element={<QuestionLifecycleStudio />} />
-                <Route path="/admin/dashboard-builder" element={<CustomDashboardBuilder />} />
-                <Route path="/admin/metric-lineage" element={<MetricLineageStudio />} />
-                <Route path="/admin/audit-center" element={<AuditCenterPage />} />
-                <Route path="/admin/curriculum-versions" element={<CurriculumBranchingStudio />} />
-                <Route path="/admin/integrations" element={<IntegrationHubPage />} />
-                <Route path="/admin/control-center" element={<SystemControlCenter />} />
+                {/* 8. Enterprise Approvals & SLA Center */}
+                <Route
+                  path="/approvals"
+                  element={
+                    <ProtectedRoute allowedRoles={['MENTOR_COACH', 'ENGINEERING_EXCELLENCE_COMMITTEE', 'SENIOR_LEADER_SPONSOR', 'TECHNOLOGY_HEAD']}>
+                      <ApprovalsPage currentRole={role} currentUserId={user?.id} currentUserName={user?.name} />
+                    </ProtectedRoute>
+                  }
+                />
 
-                {/* Executive Analytics & Scheduled Reporting */}
-                <Route path="/analytics" element={<ExecutiveAnalyticsPage />} />
-                <Route path="/reports" element={<EnterpriseReportingPage />} />
-
-                {/* Enterprise Approvals & SLA Dashboard */}
-                <Route path="/approvals" element={<ApprovalsPage currentRole={role} currentUserId={user?.id} currentUserName={user?.name} />} />
-
+                {/* Fallback route */}
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </AppShell>
@@ -206,4 +317,3 @@ createRoot(document.getElementById('root')!).render(
     </QueryClientProvider>
   </StrictMode>
 )
-

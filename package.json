@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "typecheck": "tsc -b --pretty false"
+    "typecheck": "tsc -b --pretty false",
+    "backend:start": "start_backend.bat",
+    "backend:stop": "stop_backend.bat"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.62.0",

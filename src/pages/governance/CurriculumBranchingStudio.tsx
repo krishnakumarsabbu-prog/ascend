@@ -17,6 +17,7 @@ import {
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../../lib/api'
 import type { CurriculumVersion, CurriculumBranchRequest } from '../../types'
+import { Card } from '../../components/ui'
 
 export function CurriculumBranchingStudio() {
   const queryClient = useQueryClient()
@@ -167,28 +168,28 @@ export function CurriculumBranchingStudio() {
               </div>
 
               {/* Diff Inspector Strip */}
-              <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 text-white shadow-xl space-y-4">
-                <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <Card className="p-6 space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                   <div className="flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-indigo-400" />
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-white">
+                    <Sparkles className="w-4 h-4 text-[#007df0]" />
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900">
                       Learning Objectives &amp; Module Deltas (Diff)
                     </h3>
                   </div>
-                  <span className="text-[10px] font-mono text-emerald-400">
+                  <span className="text-[10px] font-mono text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
                     {selectedVersion.modules_count} Total Modules
                   </span>
                 </div>
 
                 <div className="space-y-2">
                   {selectedVersion.learning_objectives_diff.map((diff, idx) => (
-                    <div key={idx} className="p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-emerald-300 text-xs flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <div key={idx} className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                       <span>{diff}</span>
                     </div>
                   ))}
                 </div>
-              </div>
+              </Card>
             </div>
           )}
         </div>

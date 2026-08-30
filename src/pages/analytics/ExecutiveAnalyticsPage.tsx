@@ -21,6 +21,7 @@ import {
 import { useQuery } from '@tanstack/react-query'
 import { api } from '../../lib/api'
 import type { ExecutiveAnalyticsData } from '../../types'
+import { Card } from '../../components/ui'
 
 export function ExecutiveAnalyticsPage() {
   const [activeTab, setActiveTab] = useState<'EXECUTIVE' | 'COHORTS' | 'SKILLS' | 'INTEGRITY'>('EXECUTIVE')
@@ -55,13 +56,13 @@ export function ExecutiveAnalyticsPage() {
 
         {/* Time-Range Filter */}
         <div className="flex items-center gap-2">
-          <div className="p-1 rounded-xl bg-slate-100 border border-slate-200 flex text-xs font-bold text-slate-600">
+          <div className="p-1 rounded-xl bg-slate-100 border border-slate-200/90 flex text-xs font-bold text-slate-600 shadow-2xs">
             {['30', '90', '180', '365'].map((d) => (
               <button
                 key={d}
                 onClick={() => setTimeRange(d)}
-                className={`px-3 py-1 rounded-lg transition ${
-                  timeRange === d ? 'bg-white text-indigo-700 shadow-sm' : 'hover:text-slate-900'
+                className={`px-3 py-1 rounded-lg transition-all ${
+                  timeRange === d ? 'bg-[#007df0] text-white shadow-xs' : 'hover:text-slate-900'
                 }`}
               >
                 {d}D
@@ -71,8 +72,8 @@ export function ExecutiveAnalyticsPage() {
         </div>
       </div>
 
-      {/* 4 Tabs Ribbon (Requirement 24) */}
-      <div className="flex items-center gap-2 border-b border-slate-200 pb-2 overflow-x-auto text-xs font-bold">
+      {/* 4 Tabs Ribbon */}
+      <div className="flex items-center gap-1.5 border-b border-slate-200 pb-2 overflow-x-auto text-xs font-bold">
         {[
           { key: 'EXECUTIVE', label: '1. Executive Overview', icon: TrendingUp },
           { key: 'COHORTS', label: '2. Cohort & Pathway Velocity', icon: Users },
@@ -85,10 +86,10 @@ export function ExecutiveAnalyticsPage() {
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key as any)}
-              className={`px-4 py-2 rounded-xl flex items-center gap-2 transition shrink-0 ${
+              className={`px-4 py-2 rounded-xl flex items-center gap-2 transition-all shrink-0 ${
                 isActive
-                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                  : 'text-slate-600 hover:bg-slate-100'
+                  ? 'bg-[#007df0] text-white shadow-xs font-bold'
+                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
               }`}
             >
               <Icon className="w-4 h-4" />
@@ -108,17 +109,19 @@ export function ExecutiveAnalyticsPage() {
                 {data.executive_kpis.map((kpi) => {
                   const isPositive = kpi.trend_direction === 'UP' || kpi.metric_key === 'COST_PER_READY_ENGINEER'
                   return (
-                    <div
+                    <Card
                       key={kpi.metric_key}
-                      className="p-5 rounded-2xl bg-white border border-slate-200 shadow-lg space-y-2"
+                      className="p-5 space-y-2"
                     >
                       <div className="flex items-center justify-between">
                         <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                           {kpi.label}
                         </span>
                         <span
-                          className={`px-2 py-0.5 text-[10px] font-bold rounded flex items-center gap-0.5 ${
-                            isPositive ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'
+                          className={`px-2 py-0.5 text-[10px] font-bold rounded-md flex items-center gap-0.5 border ${
+                            isPositive
+                              ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                              : 'bg-rose-50 text-rose-700 border-rose-200'
                           }`}
                         >
                           {isPositive ? (
@@ -130,34 +133,36 @@ export function ExecutiveAnalyticsPage() {
                         </span>
                       </div>
                       <div className="text-3xl font-black text-slate-900">{kpi.formatted_value}</div>
-                      <div className="text-[10px] text-slate-500 font-mono">Vs. previous {timeRange} days</div>
-                    </div>
+                      <div className="text-[10.5px] text-slate-500 font-mono">Vs. previous {timeRange} days</div>
+                    </Card>
                   )
                 })}
               </div>
 
               {/* Velocity Time-Series Trend */}
-              <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 text-white shadow-xl space-y-4">
-                <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <Card className="p-6 space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                   <div className="flex items-center gap-2">
-                    <TrendingUp className="w-4 h-4 text-indigo-400" />
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-white">
+                    <TrendingUp className="w-4 h-4 text-[#007df0]" />
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900">
                       Time-Series Velocity &amp; Readiness Curve ({timeRange} Day Trajectory)
                     </h3>
                   </div>
-                  <span className="text-xs font-mono text-emerald-400">+18.2% Compound Velocity</span>
+                  <span className="text-xs font-mono font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                    +18.2% Compound Velocity
+                  </span>
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
                   {data.time_series_velocity.map((v) => (
-                    <div key={v.day} className="p-4 rounded-xl bg-slate-950/70 border border-slate-800 space-y-1 text-center">
-                      <div className="text-[10px] font-bold text-slate-400 uppercase">{v.day}</div>
-                      <div className="text-lg font-black text-purple-300">{v.avg_readiness}% Readiness</div>
-                      <div className="text-[10px] text-emerald-400 font-mono">SE Vel: {v.se_velocity}x • AI: {v.ai_velocity}x</div>
+                    <div key={v.day} className="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1 text-center">
+                      <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{v.day}</div>
+                      <div className="text-lg font-black text-[#007df0]">{v.avg_readiness}% Readiness</div>
+                      <div className="text-[10px] text-slate-600 font-mono">SE: {v.se_velocity}x • AI: {v.ai_velocity}x</div>
                     </div>
                   ))}
                 </div>
-              </div>
+              </Card>
             </div>
           )}
 

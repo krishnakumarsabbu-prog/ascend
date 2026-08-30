@@ -18,12 +18,14 @@ const STATUS_META: Record<ASMMilestoneStatus, { label: string; dot: string; bg: 
 
 const MONTHS = Array.from({ length: 24 }, (_, index) => index + 1)
 
+import { ASMLifecyclePage } from './asm/ASMLifecyclePage'
+
 export function AsmJourney({ associateId }: { associateId: string }) {
   const queryClient = useQueryClient()
   const [selectedId, setSelectedId] = useState('asm-102')
   const [showSubmit, setShowSubmit] = useState(false)
   const [showReview, setShowReview] = useState(false)
-  const [activeView, setActiveView] = useState<'journey' | 'commissioning'>('journey')
+  const [activeView, setActiveView] = useState<'journey' | 'commissioning' | 'defense'>('journey')
 
   const asmQuery = useQuery({ queryKey: ['associate-asm', associateId], queryFn: () => api.associateAsm(associateId) })
   const commissioningQuery = useQuery({ queryKey: ['commissioning', associateId], queryFn: () => api.commissioning(associateId) })
@@ -50,7 +52,7 @@ export function AsmJourney({ associateId }: { associateId: string }) {
   return <div className="space-y-6">
     <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col justify-between gap-5 xl:flex-row xl:items-end">
       <div><div className="mb-2 flex items-center gap-2 text-xs font-medium text-slate-400"><span>Engineering Journey</span><span>/</span><span className="text-blue-600">ASM Milestones</span></div><div className="flex items-start gap-3"><div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#0c1b33] text-white shadow-lg shadow-slate-900/10"><GitBranch size={22} /></div><div><h1 className="text-2xl font-bold tracking-tight text-slate-950 md:text-3xl">ASM Milestone Journey</h1><p className="mt-1 max-w-2xl text-sm leading-6 text-slate-500">A 24-month engineering progression from foundation signal to commissioning-ready delivery.</p></div></div></div>
-      <div className="flex items-center gap-2"><div className="flex rounded-md border border-slate-200 bg-white p-1"><button onClick={() => setActiveView('journey')} className={cn('rounded px-3 py-1.5 text-xs font-semibold transition-colors', activeView === 'journey' ? 'bg-slate-900 text-white' : 'text-slate-500 hover:text-slate-800')}>Journey</button><button onClick={() => setActiveView('commissioning')} className={cn('rounded px-3 py-1.5 text-xs font-semibold transition-colors', activeView === 'commissioning' ? 'bg-slate-900 text-white' : 'text-slate-500 hover:text-slate-800')}>Commissioning path</button></div></div>
+      <div className="flex items-center gap-2"><div className="flex rounded-lg border border-slate-200 bg-slate-50 p-1"><button onClick={() => setActiveView('journey')} className={cn('rounded-md px-3 py-1.5 text-xs font-bold transition-all', activeView === 'journey' ? 'bg-[#007df0] text-white shadow-xs' : 'text-slate-500 hover:text-slate-800')}>Journey</button><button onClick={() => setActiveView('commissioning')} className={cn('rounded-md px-3 py-1.5 text-xs font-bold transition-all', activeView === 'commissioning' ? 'bg-[#007df0] text-white shadow-xs' : 'text-slate-500 hover:text-slate-800')}>Commissioning path</button><button onClick={() => setActiveView('defense')} className={cn('rounded-md px-3 py-1.5 text-xs font-bold transition-all', activeView === 'defense' ? 'bg-[#007df0] text-white shadow-xs' : 'text-slate-500 hover:text-slate-800')}>Defense Panel</button></div></div>
     </motion.div>
 
     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"><Metric label="Journey progress" value={`${completed} / ${data.milestones.length}`} detail={`${Math.round(data.overall_progress * 100)}% of ASM milestones complete`} icon={<Target size={17} />} tone="blue" /><Metric label="Credits earned" value={`${data.credits_earned}`} detail={`${data.credits_target - data.credits_earned} credits to pathway target`} icon={<Award size={17} />} tone="amber" /><Metric label="Current signal" value={current?.code || 'Clear'} detail={current?.title || 'No active milestone'} icon={<Zap size={17} />} tone="emerald" /><Metric label="Commission readiness" value={`${Math.round(commissioning.readiness * 100)}%`} detail={commissioning.commission_ready ? 'Ready for placement' : 'Progressing toward readiness'} icon={<ShieldCheck size={17} />} tone="navy" /></div>
@@ -62,7 +64,11 @@ export function AsmJourney({ associateId }: { associateId: string }) {
       </Card>
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_390px]"><Card className="overflow-hidden"><div className="flex items-center justify-between border-b border-slate-100 px-5 py-4"><div><h2 className="text-sm font-bold text-slate-900">Milestone register</h2><p className="mt-0.5 text-xs text-slate-400">Select a gate to inspect its evidence and assessment standard.</p></div><Badge className="bg-slate-100 text-slate-600">{data.milestones.length} gates</Badge></div><div className="divide-y divide-slate-100">{data.milestones.map((milestone, index) => <MilestoneRow key={milestone.id} milestone={milestone} index={index} selected={selectedId === milestone.id} onSelect={() => setSelectedId(milestone.id)} />)}</div></Card>{selected && <MilestoneDetail milestone={selected} onStart={() => startMutation.mutate()} onSubmit={() => setShowSubmit(true)} onReview={() => setShowReview(true)} starting={startMutation.isPending} />}</div>
-    </> : <CommissioningPanel path={commissioning} onSelect={(id) => { setActiveView('journey'); setSelectedId(id) }} />}
+    </> : activeView === 'commissioning' ? (
+      <CommissioningPanel path={commissioning} onSelect={(id) => { setActiveView('journey'); setSelectedId(id) }} />
+    ) : (
+      <ASMLifecyclePage associateId={associateId} />
+    )}
 
     <AnimatePresence>{showSubmit && selected && <EvidenceModal milestone={selected} onCancel={() => setShowSubmit(false)} onSubmit={(payload) => submitMutation.mutate(payload)} loading={submitMutation.isPending} />}{showReview && selected && <ReviewModal milestone={selected} onCancel={() => setShowReview(false)} onSubmit={(payload) => reviewMutation.mutate(payload)} loading={reviewMutation.isPending} />}</AnimatePresence>
   </div>

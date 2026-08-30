@@ -19,6 +19,7 @@ import {
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../../lib/api'
 import type { MarketplaceProject, MarketplaceApplication } from '../../types'
+import { Card } from '../../components/ui'
 
 interface TalentMarketplacePageProps {
   associateId?: string
@@ -232,13 +233,13 @@ export function TalentMarketplacePage({ associateId = 'as-ananya' }: TalentMarke
           </div>
         </div>
 
-        {/* Right Col: My Active Applications Pipeline (Requirement 22) */}
+        {/* Right Col: My Active Applications Pipeline */}
         <div className="space-y-4">
-          <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 text-white shadow-xl space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+          <Card className="p-6 space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
-                <Target className="w-4 h-4 text-indigo-400" />
-                <h3 className="text-xs font-bold uppercase tracking-wider text-white">
+                <Target className="w-4 h-4 text-[#007df0]" />
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800">
                   My Gig Applications ({applications.length})
                 </h3>
               </div>
@@ -246,28 +247,33 @@ export function TalentMarketplacePage({ associateId = 'as-ananya' }: TalentMarke
 
             <div className="space-y-3">
               {applications.map((app) => (
-                <div key={app.id} className="p-4 rounded-xl bg-slate-950/70 border border-slate-800 space-y-2.5">
+                <div key={app.id} className="p-4 rounded-xl bg-slate-50 border border-slate-200/90 space-y-2.5">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-mono text-indigo-400">{app.pathway}</span>
+                    <span className="text-[10px] font-mono text-[#007df0] font-bold">{app.pathway}</span>
                     <span className={`px-2 py-0.5 text-[9px] font-bold rounded border ${getStatusBadge(app.status)}`}>
                       {app.status}
                     </span>
                   </div>
 
-                  <h4 className="text-xs font-bold text-white leading-snug">{app.project_title}</h4>
+                  <h4 className="text-xs font-bold text-slate-900 leading-snug">{app.project_title}</h4>
 
-                  <div className="text-[10px] text-slate-400 italic bg-slate-900/60 p-2 rounded-lg border border-slate-800/60">
+                  <div className="text-[10.5px] text-slate-600 italic bg-white p-2 rounded-lg border border-slate-200">
                     "{app.candidate_pitch}"
                   </div>
 
-                  <div className="flex items-center justify-between text-[10px] font-mono text-slate-500 pt-1 border-t border-slate-800/60">
-                    <span>Applied: {app.applied_at}</span>
-                    <span className="text-emerald-400 font-bold">{app.match_score}% Match</span>
+                  <div className="text-[10px] text-slate-400 font-medium pt-1">
+                    Applied: {new Date(app.applied_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
                   </div>
                 </div>
               ))}
+
+              {applications.length === 0 && (
+                <div className="p-6 text-center text-xs text-slate-400">
+                  No active gig applications yet. Browse the catalog to apply!
+                </div>
+              )}
             </div>
-          </div>
+          </Card>
         </div>
       </div>
 

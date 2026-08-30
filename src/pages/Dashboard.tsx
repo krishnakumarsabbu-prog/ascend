@@ -26,32 +26,32 @@ export function Dashboard({ data, isLoading }: { data?: DashboardData; isLoading
     <div className="grid gap-6 xl:grid-cols-[1.2fr_1fr]"><Card><SectionHeading title="Next actions" subtitle="Prioritized steps to keep your journey moving" action="View all actions" />{data.next_actions.length === 0 ? <EmptyState text="No actions assigned" /> : <div className="divide-y divide-slate-100">{data.next_actions.map((action, i) => <ActionRow key={action.id} action={action} index={i} />)}</div>}</Card><Card><SectionHeading title="My progress" subtitle="Progress across your development pillars" /><div className="space-y-5 px-5 pb-5">{data.progress_segments.map((segment) => <div key={segment.label}><div className="mb-2 flex items-center justify-between"><div className="flex items-center gap-2"><span className="text-xs font-semibold text-slate-700">{segment.label}</span>{segment.status === 'COMPLETED' && <Check size={13} className="text-emerald-500" />}</div><span className="text-[11px] font-bold text-slate-500">{segment.value} <span className="font-normal text-slate-400">/ {segment.target}</span></span></div><ProgressBar value={segment.value / segment.target} color={segment.status === 'COMPLETED' ? 'bg-emerald-500' : 'bg-blue-600'} /></div>)}</div></Card></div>
 
     {/* Skills Intelligence Spotlight Banner */}
-    <div className="p-6 rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950/50 to-slate-950 border border-indigo-500/30 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+    <Card className="p-6 bg-gradient-to-r from-sky-50/80 via-indigo-50/40 to-white border-sky-200/90 shadow-2xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
       <div className="flex items-center gap-3.5">
-        <div className="p-3 rounded-xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
-          <Sparkles className="w-6 h-6" />
+        <div className="p-3 rounded-xl bg-white text-[#007df0] border border-sky-200 shadow-2xs">
+          <Sparkles className="w-6 h-6 text-[#007df0]" />
         </div>
         <div>
           <div className="flex items-center gap-2 mb-0.5">
-            <span className="px-2 py-0.5 text-[10px] font-black rounded bg-indigo-500/20 text-indigo-300 uppercase">
+            <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-sky-100 text-sky-800 uppercase">
               Skills Intelligence
             </span>
-            <span className="text-xs text-slate-400">10 Tracked Skills across 5 Enterprise Domains</span>
+            <span className="text-xs text-slate-500 font-medium">10 Tracked Skills across 5 Enterprise Domains</span>
           </div>
-          <h3 className="text-base font-bold text-white">Java Concurrency (62% vs Target 80%) & Kafka Streaming gaps identified</h3>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <h3 className="text-base font-bold text-slate-900">Java Concurrency (62% vs Target 80%) &amp; Kafka Streaming gaps identified</h3>
+          <p className="text-xs text-slate-500 mt-0.5">
             Targeting these 2 high-priority competencies will boost your pathway readiness by +8.5%.
           </p>
         </div>
       </div>
       <a
         href="/my-skills"
-        className="px-4 py-2 text-xs font-bold rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white transition shadow-lg shadow-indigo-600/30 flex items-center gap-1.5 shrink-0"
+        className="px-4 py-2 text-xs font-bold rounded-xl bg-[#007df0] hover:bg-[#0069cc] text-white transition shadow-xs flex items-center gap-1.5 shrink-0"
       >
-        <span>Open My Skills & Evidence</span>
+        <span>Open My Skills &amp; Evidence</span>
         <ChevronRight className="w-4 h-4" />
       </a>
-    </div>
+    </Card>
 
     <Card><SectionHeading title="Recent credit activity" subtitle="A transparent record of your earned credits" action="Open credit ledger" /><div className="overflow-x-auto"><table className="w-full min-w-[600px] text-left text-xs"><thead className="border-b border-slate-100 bg-slate-50/60 text-[10px] uppercase tracking-wider text-slate-400"><tr><th className="px-5 py-3 font-semibold">Activity</th><th className="px-5 py-3 font-semibold">Source</th><th className="px-5 py-3 font-semibold">Date</th><th className="px-5 py-3 text-right font-semibold">Credits</th><th className="px-5 py-3 text-right font-semibold">Balance</th></tr></thead><tbody className="divide-y divide-slate-100">{data.recent_credits.map((credit) => <tr key={credit.id} className="transition-colors hover:bg-slate-50"><td className="px-5 py-3.5 font-semibold text-slate-800">{credit.description}</td><td className="px-5 py-3.5 text-slate-500">{credit.source}</td><td className="px-5 py-3.5 text-slate-500">{new Date(credit.awarded_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</td><td className="px-5 py-3.5 text-right font-bold text-emerald-600">+{credit.amount}</td><td className="px-5 py-3.5 text-right font-semibold text-slate-700">{credit.balance_after}</td></tr>)}</tbody></table></div></Card>
   </div>

@@ -10,7 +10,7 @@ from app.models.schemas import (
     AdaptiveAnswerSubmit,
     AdaptiveAnswerResult,
     GovernanceQuestion,
-    Question,
+    AdaptiveQuestion,
     Choice,
     ProctoringViolation,
     ProctoringTelemetry,
@@ -49,8 +49,8 @@ class AssessmentEngineService:
         best_item = max(available, key=lambda q: self._fisher_information(theta, q.irt_a_discrimination, q.irt_b_difficulty))
         return best_item
 
-    def _convert_to_question(self, gq: GovernanceQuestion) -> Question:
-        return Question(
+    def _convert_to_question(self, gq: GovernanceQuestion) -> AdaptiveQuestion:
+        return AdaptiveQuestion(
             id=gq.id,
             course_id="c-wf101",
             title=gq.title,

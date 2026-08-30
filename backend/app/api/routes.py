@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from typing import Any, Dict, List, Optional
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
@@ -251,6 +252,17 @@ def start_assessment(body: StartAttemptRequest):
     repo = get_repository()
     service = AssessmentService(repo)
     summary = service.start_attempt(body.course_id, body.associate_id)
+    if not summary:
+        raise HTTPException(status_code=404, detail="Course not found")
+    return summary
+
+
+@router.post("/assessments/{course_id}/start")
+def start_assessment_by_id(course_id: str, body: dict = None):
+    repo = get_repository()
+    service = AssessmentService(repo)
+    assoc_id = (body or {}).get("associate_id", "as-ananya")
+    summary = service.start_attempt(course_id, assoc_id)
     if not summary:
         raise HTTPException(status_code=404, detail="Course not found")
     return summary

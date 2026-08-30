@@ -1074,7 +1074,7 @@ class Choice(BaseModel):
     text: str
 
 
-class Question(BaseModel):
+class AdaptiveQuestion(BaseModel):
     id: str
     course_id: str = "c-wf101"
     title: str
@@ -1104,7 +1104,7 @@ class AdaptiveTestSession(BaseModel):
     target_sem_stop: float = 0.28
     is_completed: bool = False
     ability_history: List[float] = Field(default_factory=list)
-    current_question: Optional[Question] = None
+    current_question: Optional[AdaptiveQuestion] = None
     domain_breakdown: Dict[str, int] = Field(default_factory=dict)
 
 
@@ -1125,7 +1125,7 @@ class AdaptiveAnswerResult(BaseModel):
     ability_trajectory: str  # INCREASING, STEADY, DECREASING
     is_completed: bool
     final_grade: Optional[str] = None
-    next_question: Optional[Question] = None
+    next_question: Optional[AdaptiveQuestion] = None
     explanation: str
     proctoring_flagged: bool = False
 

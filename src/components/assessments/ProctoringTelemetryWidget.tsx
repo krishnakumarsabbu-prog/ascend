@@ -1,5 +1,6 @@
 import { ShieldAlert, ShieldCheck, Eye, Copy, Zap, AlertTriangle } from 'lucide-react'
 import type { ProctoringTelemetry } from '../../types'
+import { Card } from '../ui'
 
 interface ProctoringTelemetryWidgetProps {
   telemetry?: ProctoringTelemetry | null
@@ -18,23 +19,23 @@ export function ProctoringTelemetryWidget({
   const isHealthy = score >= 85
 
   return (
-    <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl space-y-3">
-      <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
+    <Card className="p-4 space-y-3">
+      <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
         <div className="flex items-center gap-2">
           {isHealthy ? (
-            <ShieldCheck className="w-4 h-4 text-emerald-400" />
+            <ShieldCheck className="w-4 h-4 text-emerald-600" />
           ) : (
-            <ShieldAlert className="w-4 h-4 text-amber-400 animate-bounce" />
+            <ShieldAlert className="w-4 h-4 text-amber-600 animate-bounce" />
           )}
-          <span className="text-xs font-bold text-white uppercase tracking-wider">
-            Assessment Integrity Monitor (Req 19)
+          <span className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+            Assessment Integrity Monitor
           </span>
         </div>
         <div className="flex items-center gap-1.5 font-mono text-xs">
           <span className="text-slate-400">Score:</span>
           <span
             className={`font-black ${
-              score >= 90 ? 'text-emerald-400' : score >= 75 ? 'text-amber-400' : 'text-rose-400'
+              score >= 90 ? 'text-emerald-600' : score >= 75 ? 'text-amber-600' : 'text-rose-600'
             }`}
           >
             {score}/100
@@ -43,29 +44,29 @@ export function ProctoringTelemetryWidget({
       </div>
 
       <div className="grid grid-cols-3 gap-2 text-center text-[10px]">
-        <div className="p-2 rounded-xl bg-slate-950/70 border border-slate-800/80">
-          <div className="text-slate-400 flex items-center justify-center gap-1">
-            <Eye className="w-3 h-3 text-indigo-400" /> Focus Loss
+        <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+          <div className="text-slate-500 font-semibold flex items-center justify-center gap-1">
+            <Eye className="w-3 h-3 text-[#007df0]" /> Focus Loss
           </div>
-          <div className={`font-bold mt-0.5 text-xs ${tabCount > 0 ? 'text-amber-400' : 'text-slate-200'}`}>
+          <div className={`font-bold mt-0.5 text-xs ${tabCount > 0 ? 'text-amber-600' : 'text-slate-800'}`}>
             {tabCount} event(s)
           </div>
         </div>
 
-        <div className="p-2 rounded-xl bg-slate-950/70 border border-slate-800/80">
-          <div className="text-slate-400 flex items-center justify-center gap-1">
-            <Copy className="w-3 h-3 text-indigo-400" /> Clipboard
+        <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+          <div className="text-slate-500 font-semibold flex items-center justify-center gap-1">
+            <Copy className="w-3 h-3 text-[#007df0]" /> Clipboard
           </div>
-          <div className={`font-bold mt-0.5 text-xs ${copyCount > 0 ? 'text-rose-400' : 'text-slate-200'}`}>
+          <div className={`font-bold mt-0.5 text-xs ${copyCount > 0 ? 'text-rose-600' : 'text-slate-800'}`}>
             {copyCount} paste(s)
           </div>
         </div>
 
-        <div className="p-2 rounded-xl bg-slate-950/70 border border-slate-800/80">
-          <div className="text-slate-400 flex items-center justify-center gap-1">
-            <Zap className="w-3 h-3 text-indigo-400" /> Keystroke
+        <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+          <div className="text-slate-500 font-semibold flex items-center justify-center gap-1">
+            <Zap className="w-3 h-3 text-[#007df0]" /> Keystroke
           </div>
-          <div className="font-bold mt-0.5 text-xs text-slate-200">
+          <div className="font-bold mt-0.5 text-xs text-slate-800">
             {telemetry?.keystroke_typing_wpm ?? 58.0} WPM
           </div>
         </div>
@@ -80,15 +81,15 @@ export function ProctoringTelemetryWidget({
             {telemetry.violations.map((v) => (
               <div
                 key={v.id}
-                className="p-1.5 rounded bg-slate-950 border border-slate-800/80 text-[10px] flex items-center justify-between text-slate-300"
+                className="p-1.5 rounded bg-slate-50 border border-slate-200 text-[10px] flex items-center justify-between text-slate-700"
               >
                 <span className="truncate max-w-[200px]">{v.description}</span>
-                <span className="text-[9px] font-bold text-amber-400">{v.severity}</span>
+                <span className="text-[9px] font-bold text-amber-600">{v.severity}</span>
               </div>
             ))}
           </div>
         </div>
       )}
-    </div>
+    </Card>
   )
 }

@@ -20,6 +20,7 @@ import {
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../../lib/api'
 import type { ScoringRuleConfig, SystemHealthStatus } from '../../types'
+import { Card } from '../../components/ui'
 
 export function SystemControlCenter() {
   const queryClient = useQueryClient()
@@ -298,17 +299,17 @@ export function SystemControlCenter() {
 
             {/* Live Calibration Simulation Preview */}
             <div className="space-y-4">
-              <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 text-white shadow-xl space-y-4">
-                <div className="flex items-center gap-2 border-b border-slate-800 pb-3">
-                  <Sparkles className="w-4 h-4 text-purple-400" />
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-white">
+              <Card className="p-6 space-y-4">
+                <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
+                  <Sparkles className="w-4 h-4 text-[#007df0]" />
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900">
                     Live Score Recalculation Preview
                   </h3>
                 </div>
 
-                <div className="p-4 rounded-xl bg-slate-950 text-center space-y-1">
-                  <div className="text-[10px] text-slate-400 uppercase font-mono">Simulated Associate Score</div>
-                  <div className="text-3xl font-black text-emerald-400">
+                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-center space-y-1">
+                  <div className="text-[10px] text-slate-500 uppercase font-mono">Simulated Associate Score</div>
+                  <div className="text-3xl font-black text-emerald-600">
                     {(
                       88.2 * technicalWeight +
                       74.8 * architectureWeight +
@@ -317,15 +318,15 @@ export function SystemControlCenter() {
                       81.0 * leadershipWeight
                     ).toFixed(1)}%
                   </div>
-                  <div className="text-[10px] text-emerald-300 font-mono">
+                  <div className="text-[10px] text-emerald-700 font-mono font-bold">
                     Status: PASS (Above {minPassScore}% bar)
                   </div>
                 </div>
 
-                <div className="text-[11px] text-slate-400 leading-relaxed">
+                <div className="text-[11px] text-slate-500 leading-relaxed">
                   Adjusting scoring weights updates graduation probabilities and readiness alerts across all GDA cohort views in real-time.
                 </div>
-              </div>
+              </Card>
             </div>
           </div>
         </div>
@@ -334,7 +335,7 @@ export function SystemControlCenter() {
       {/* TAB 2: GLOBAL FEATURE FLAGS */}
       {activeTab === 'FLAGS' && (
         <div className="max-w-3xl space-y-4">
-          <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-xl space-y-4">
+          <Card className="p-6 space-y-4">
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900">
               Live Global Feature Flags
             </h3>
@@ -363,43 +364,43 @@ export function SystemControlCenter() {
                 </div>
               ))}
             </div>
-          </div>
+          </Card>
         </div>
       )}
 
       {/* TAB 3: INFRASTRUCTURE HEALTH */}
       {activeTab === 'HEALTH' && health && (
         <div className="max-w-3xl space-y-4">
-          <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 text-white shadow-xl space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+          <Card className="p-6 space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
-                <Server className="w-4 h-4 text-emerald-400" />
-                <h3 className="text-xs font-bold uppercase tracking-wider text-white">
+                <Server className="w-4 h-4 text-emerald-600" />
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900">
                   Infrastructure &amp; Telemetry Status
                 </h3>
               </div>
-              <span className="text-xs font-mono text-emerald-400">{health.uptime_pct}% Uptime</span>
+              <span className="text-xs font-mono text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">{health.uptime_pct}% Uptime</span>
             </div>
 
             <div className="space-y-3 text-xs">
-              <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between">
-                <span className="text-slate-400">PostgreSQL Database:</span>
-                <span className="font-bold text-emerald-400">{health.database_status}</span>
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+                <span className="text-slate-500 font-semibold">PostgreSQL Database:</span>
+                <span className="font-bold text-emerald-600">{health.database_status}</span>
               </div>
-              <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between">
-                <span className="text-slate-400">Vector Store (RAG):</span>
-                <span className="font-bold text-purple-400">{health.vector_store_status}</span>
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+                <span className="text-slate-500 font-semibold">Vector Store (RAG):</span>
+                <span className="font-bold text-purple-600">{health.vector_store_status}</span>
               </div>
-              <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between">
-                <span className="text-slate-400">2PL IRT CAT Compute Latency:</span>
-                <span className="font-mono font-bold text-indigo-400">{health.irt_engine_latency_ms}ms P99</span>
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+                <span className="text-slate-500 font-semibold">2PL IRT CAT Compute Latency:</span>
+                <span className="font-mono font-bold text-[#007df0]">{health.irt_engine_latency_ms}ms P99</span>
               </div>
-              <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between">
-                <span className="text-slate-400">xAPI Stream Ingestion:</span>
-                <span className="font-bold text-emerald-400">{health.lrs_stream_status}</span>
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+                <span className="text-slate-500 font-semibold">xAPI LRS Ingestion Stream:</span>
+                <span className="font-bold text-emerald-600">{health.lrs_stream_status}</span>
               </div>
             </div>
-          </div>
+          </Card>
         </div>
       )}
     </div>
